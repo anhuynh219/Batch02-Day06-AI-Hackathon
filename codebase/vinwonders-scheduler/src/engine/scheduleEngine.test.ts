@@ -104,4 +104,50 @@ describe('buildItinerary', () => {
     })
     expect(items).toEqual([])
   })
+
+  it('pins a locked entry to its lockedStart, leaving a gap', () => {
+    // r1 is locked at 11:00; even though it could start at 09:00 it stays put.
+    const entries: PlanEntry[] = [
+      { kind: 'attraction', refId: 'r1', locked: true, lockedStart: '11:00' },
+    ]
+    const items = buildItinerary({ entries, constraints: baseConstraints, attractions: attrs, travel })
+    expect(items[0].startTime).toBe('11:00')
+    expect(items[0].endTime).toBe('11:30')
+    expect(items[0].warning).toBeUndefined()
+  })
+
+  it('keeps a locked entry fixed instead of sequencing it after the previous stop', () => {
+    // Without the lock r2 would start at 09:40 (09:30 + 10 buffer); locked at 11:00 it stays put.
+    const entries: PlanEntry[] = [
+      { kind: 'attraction', refId: 'r1' },
+      { kind: 'attraction', refId: 'r2', locked: true, lockedStart: '11:00' },
+    ]
+    const items = buildItinerary({ entries, constraints: baseConstraints, attractions: attrs, travel })
+    expect(items[1].startTime).toBe('11:00')
+    expect(items[1].endTime).toBe('11:20')
+  })
+
+  it('warns when a locked time overlaps the previous stop', () => {
+    // r1 09:00-09:30; r2 locked at 09:10 (< 09:30 cursor) -> overlap warning.
+    const entries: PlanEntry[] = [
+      { kind: 'attraction', refId: 'r1' },
+      { kind: 'attraction', refId: 'r2', locked: true, lockedStart: '09:10' },
+    ]
+    const items = buildItinerary({ entries, constraints: baseConstraints, attractions: attrs, travel })
+    expect(items[1].startTime).toBe('09:10')
+    expect(items[1].warning).toMatch(/chồng lấn/i)
+  })
+
+  it('does not pull later stops into the past after an overlapping locked stop', () => {
+    // r1 09:00-09:30 (cursor 09:30); r2 locked 09:00-09:20 ends BEFORE the cursor;
+    // r1b must continue from 09:30, not be dragged back to the locked stop's 09:20 end.
+    const entries: PlanEntry[] = [
+      { kind: 'attraction', refId: 'r1' },                                  // A 09:00-09:30
+      { kind: 'attraction', refId: 'r2', locked: true, lockedStart: '09:00' }, // B, pinned 09:00-09:20
+      { kind: 'attraction', refId: 'r1', locked: false },                  // A again
+    ]
+    const items = buildItinerary({ entries, constraints: baseConstraints, attractions: attrs, travel })
+    expect(items[1].endTime).toBe('09:20')
+    expect(items[2].startTime).toBe('09:40') // 09:30 cursor + 10 buffer, not 09:20 + 10
+  })
 })

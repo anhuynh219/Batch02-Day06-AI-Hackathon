@@ -53,10 +53,12 @@ export type UserConstraints = {
 }
 
 // What the engine consumes: an ordered list of plan entries.
+// `lockedStart` ("HH:MM") pins the entry to a fixed start time (set when the user
+// locks it); the engine schedules around it instead of re-sequencing it.
 export type PlanEntry =
-  | { kind: 'attraction'; refId: string; locked?: boolean }
-  | { kind: 'meal'; meal: Meal; durationMin: number; zoneId?: string | null; locked?: boolean }
-  | { kind: 'break'; durationMin: number; locked?: boolean }
+  | { kind: 'attraction'; refId: string; locked?: boolean; lockedStart?: string }
+  | { kind: 'meal'; meal: Meal; durationMin: number; zoneId?: string | null; locked?: boolean; lockedStart?: string }
+  | { kind: 'break'; durationMin: number; locked?: boolean; lockedStart?: string }
 
 // Gemini's structured response (mirrored in server/gemini.ts schema)
 export type PlanResponse = {

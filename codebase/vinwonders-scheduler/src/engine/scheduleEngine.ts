@@ -39,7 +39,13 @@ export function buildItinerary({ entries, constraints, attractions, travel, entr
       let start = cursor + buffer
       const warnings: string[] = []
 
-      if (a.kind === 'show' && a.showTimes?.length) {
+      if (entry.locked && entry.lockedStart) {
+        // User pinned this stop to a fixed time: honour it even if it leaves a gap
+        // or overlaps the previous stop (warn in the overlap case).
+        const pinned = toMinutes(entry.lockedStart)
+        if (pinned < start) warnings.push('Giờ đã khoá bị chồng lấn với mục trước')
+        start = pinned
+      } else if (a.kind === 'show' && a.showTimes?.length) {
         const show = a.showTimes.map(toMinutes).find((t) => t >= cursor) ?? toMinutes(a.showTimes[0])
         if (start > show) warnings.push('Có thể không kịp giờ show — cần tới sớm hơn')
         start = show
@@ -56,30 +62,45 @@ export function buildItinerary({ entries, constraints, attractions, travel, entr
         title: a.name, zoneId: a.zoneId, startTime: toHHMM(start), endTime: toHHMM(end),
         locked: !!entry.locked, warning: warnings[0],
       })
-      cursor = end
+      // Never let the cursor move backwards: a locked stop pinned earlier than the
+      // running cursor must not pull the following stops into the past.
+      cursor = Math.max(cursor, end)
       prevZone = a.zoneId
     } else if (entry.kind === 'meal') {
       const buffer = travel(prevZone, entry.zoneId ?? prevZone)
-      const start = cursor + buffer
+      let start = cursor + buffer
+      const warnings: string[] = []
+      if (entry.locked && entry.lockedStart) {
+        const pinned = toMinutes(entry.lockedStart)
+        if (pinned < start) warnings.push('Giờ đã khoá bị chồng lấn với mục trước')
+        start = pinned
+      }
       const end = start + entry.durationMin
-      const warning = end > departure ? 'Vượt quá giờ về dự kiến' : undefined
+      if (end > departure) warnings.push('Vượt quá giờ về dự kiến')
+      const warning = warnings[0]
       items.push({
         id: nextId(), refId: null, type: 'meal',
         title: `Ăn ${entry.meal.type === 'lunch' ? 'trưa' : entry.meal.type === 'dinner' ? 'tối' : 'nhẹ'}`,
         zoneId: entry.zoneId ?? null, startTime: toHHMM(start), endTime: toHHMM(end),
         locked: !!entry.locked, warning,
       })
-      cursor = end
+      cursor = Math.max(cursor, end)
       prevZone = entry.zoneId ?? prevZone
     } else {
-      const start = cursor
+      let start = cursor
+      let warning: string | undefined
+      if (entry.locked && entry.lockedStart) {
+        const pinned = toMinutes(entry.lockedStart)
+        if (pinned < start) warning = 'Giờ đã khoá bị chồng lấn với mục trước'
+        start = pinned
+      }
       const end = start + entry.durationMin
       items.push({
         id: nextId(), refId: null, type: 'break', title: 'Nghỉ ngơi',
         zoneId: prevZone, startTime: toHHMM(start), endTime: toHHMM(end),
-        locked: !!entry.locked,
+        locked: !!entry.locked, warning,
       })
-      cursor = end
+      cursor = Math.max(cursor, end)
     }
   }
   return items

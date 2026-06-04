@@ -100,7 +100,11 @@ export const useStore = create<State>((set, get) => ({
     const offset = it[0]?.type === 'entrance' ? 1 : 0
     const ei = idx - offset
     const entries = get().entries.slice()
-    entries[ei] = { ...entries[ei], locked: !entries[ei].locked }
+    // Lock: pin to the stop's current start time. Unlock: drop the pin so the
+    // engine re-sequences it normally.
+    entries[ei] = entries[ei].locked
+      ? { ...entries[ei], locked: false, lockedStart: undefined }
+      : { ...entries[ei], locked: true, lockedStart: it[idx].startTime }
     get().setEntries(entries)
   },
   reorder: (fromId, toId) => {

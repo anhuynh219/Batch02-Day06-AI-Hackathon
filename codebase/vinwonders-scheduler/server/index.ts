@@ -4,7 +4,25 @@ import cors from 'cors'
 import { askGemini } from './gemini'
 import { ATTRACTIONS, ATTRACTIONS_BY_ID } from '../src/data/attractions'
 import { ZONES_BY_ID } from '../src/data/zones'
+import { normalizeTime } from '../src/engine/time'
 import type { PlanResponse } from '../src/types'
+
+// Coerce loose time strings from Gemini ("9h", "2 giờ chiều", …) into strict
+// "HH:MM" before they reach the engine. Drop arrival/departure values that can't
+// be parsed so the store keeps its safe defaults instead of producing "NaN:NaN".
+function normalizeConstraints(c: PlanResponse['constraints']): PlanResponse['constraints'] {
+  if (!c || typeof c !== 'object') return c
+  const at = normalizeTime(c.arrivalTime)
+  if (at) c.arrivalTime = at
+  else delete c.arrivalTime
+  const dt = normalizeTime(c.departureTime)
+  if (dt) c.departureTime = dt
+  else delete c.departureTime
+  if (Array.isArray(c.meals)) {
+    c.meals = c.meals.map((m) => ({ ...m, around: normalizeTime(m.around) ?? m.around }))
+  }
+  return c
+}
 
 const app = express()
 app.use(cors())
@@ -22,6 +40,7 @@ app.post('/api/plan', async (req, res) => {
       try {
         const r = await askGemini({ messages, itinerarySummary, menu })
         if (r.chosenIds) r.chosenIds = r.chosenIds.filter((id) => ATTRACTIONS_BY_ID[id])
+        if (r.constraints) r.constraints = normalizeConstraints(r.constraints)
         out = r
       } catch (e) {
         if (attempt === 1) throw e
