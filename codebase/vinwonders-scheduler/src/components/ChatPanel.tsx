@@ -12,7 +12,7 @@ const EXAMPLES = [
 
 export function ChatPanel() {
   const [input, setInput] = useState('')
-  const { messages, pushMessage, setConstraints, resetConstraints, setEntries, entries, itinerary, busy, setBusy, lastSuggestedIds, setLastSuggestedIds } = useStore()
+  const { messages, pushMessage, setConstraints, resetConstraints, setEntries, itinerary, busy, setBusy, lastSuggestedIds, setLastSuggestedIds } = useStore()
 
   async function send(text?: string) {
     const value = (text ?? input).trim()
