@@ -10,13 +10,14 @@ export const ZONES: Zone[] = [
 ]
 
 // Điểm bắt đầu cố định của mọi lịch trình: quầy vé / cổng vào.
-// Đặt tại quảng trường cổng (theo geojson: bảng welcome-map 10.339724/103.854988 +
-// cột chỉ dẫn 10.339420/103.854577, ngay dưới bãi đỗ xe). Chỉnh tinh qua Calibration.
+// Đặt tại cổng phía BẮC sát bãi đỗ xe: nút đường đi bộ gần bãi xe nhất trong geojson
+// (10.341548/103.854801, cách bãi xe ~10m) — vừa đúng vị trí cổng vừa nằm trên mạng
+// đường nên định tuyến nối thẳng. Chỉnh tinh qua Calibration.
 export const ENTRANCE: Zone = {
   id: 'entrance',
   name: 'Quầy vé / Cổng vào',
   color: '#334155',
-  latLng: { lat: 10.339600, lng: 103.854780 },
+  latLng: { lat: 10.341548, lng: 103.854801 },
   shortDesc: 'Điểm bắt đầu — mua vé và vào cổng',
 }
 
