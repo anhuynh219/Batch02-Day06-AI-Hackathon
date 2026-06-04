@@ -10,9 +10,12 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 
-const menu = ATTRACTIONS.map((a) =>
-  `${a.id} — ${a.name} — ${ZONES_BY_ID[a.zoneId].name} — ${a.kind} — ${a.durationMin}p — cường độ ${a.intensity} — ${a.kidFriendly ? 'hợp trẻ em' : 'không hợp trẻ nhỏ'}`,
-).join('\n')
+const menu = ATTRACTIONS.map((a) => {
+  const timeStr = a.showTimes && a.showTimes.length > 0
+    ? `giờ diễn: ${a.showTimes.join(', ')}`
+    : `mở: ${a.openTime} - đóng: ${a.closeTime}`
+  return `${a.id} — ${a.name} — ${ZONES_BY_ID[a.zoneId].name} — ${a.kind} — ${a.durationMin}p — cường độ ${a.intensity} — ${a.kidFriendly ? 'hợp trẻ em' : 'không hợp trẻ nhỏ'} — ${timeStr}`
+}).join('\n')
 
 app.post('/api/plan', async (req, res) => {
   const { messages = [], itinerarySummary = '' } = req.body ?? {}
