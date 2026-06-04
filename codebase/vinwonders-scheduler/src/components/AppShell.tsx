@@ -22,6 +22,7 @@ function Logo() {
 
 export function AppShell() {
   const openSurvey = useStore((s) => s.openSurvey)
+  const surveyOpen = useStore((s) => s.surveyOpen)
   return (
     <div className="tropic-bg grain relative h-full flex overflow-hidden">
       <aside className="relative z-10 w-[35%] min-w-[340px] flex flex-col bg-cream/95 backdrop-blur-sm border-r border-ink/10 shadow-[8px_0_30px_-20px_rgba(21,48,46,0.5)]">
@@ -59,7 +60,7 @@ export function AppShell() {
           <Timeline />
         </section>
       </main>
-      <SurveyModal />
+      <SurveyModal key={surveyOpen ? 'open' : 'closed'} />
     </div>
   )
 }

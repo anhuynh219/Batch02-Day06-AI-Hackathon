@@ -10,6 +10,10 @@ import { requestPlan } from '../lib/aiClient'
 import type { SurveyProfile } from '../survey/types'
 import { toConstraints, toPersona, toSeedPrompt } from '../survey/profileMapping'
 
+function safeParseProfile(): SurveyProfile | null {
+  try { return JSON.parse(localStorage.getItem('surveyProfile') || 'null') } catch { return null }
+}
+
 export type ChatMsg = { role: 'user' | 'assistant'; text: string }
 
 const DEFAULT_CONSTRAINTS: UserConstraints = {
@@ -127,8 +131,8 @@ export const useStore = create<State>((set, get) => ({
   calibrating: false,
   calibratingZoneId: null,
   lastSuggestedIds: [],
-  profile: JSON.parse(localStorage.getItem('surveyProfile') || 'null'),
-  persona: (() => { const p = JSON.parse(localStorage.getItem('surveyProfile') || 'null'); return p ? toPersona(p) : '' })(),
+  profile: safeParseProfile(),
+  persona: (() => { const p = safeParseProfile(); return p ? toPersona(p) : '' })(),
   surveyOpen: !localStorage.getItem('surveyDone'),
   surveyDone: !!localStorage.getItem('surveyDone'),
   pushMessage: (m) => set((s) => ({ messages: [...s.messages, m] })),
