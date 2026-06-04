@@ -48,6 +48,7 @@ type State = {
   lastSuggestedIds: string[]
   pushMessage: (m: ChatMsg) => void
   setConstraints: (c: Partial<UserConstraints>) => void
+  resetConstraints: () => void
   setEntries: (e: PlanEntry[]) => void
   recompute: () => void
   removeItem: (id: string) => void
@@ -74,6 +75,7 @@ export const useStore = create<State>((set, get) => ({
   lastSuggestedIds: [],
   pushMessage: (m) => set((s) => ({ messages: [...s.messages, m] })),
   setConstraints: (c) => set((s) => ({ constraints: { ...s.constraints, ...c } })),
+  resetConstraints: () => set({ constraints: DEFAULT_CONSTRAINTS }),
   setEntries: (e) => { set({ entries: e }); get().recompute() },
   recompute: () => set((s) => ({
     itinerary: buildItinerary({
