@@ -1,5 +1,5 @@
 import { useMapEvents } from 'react-leaflet'
-import { useStore } from '../store/useStore'
+import { useStore, placeLatLng } from '../store/useStore'
 import { CALIBRATABLE_ZONES, ZONES_BY_ID } from '../data/zones'
 import { ATTRACTIONS } from '../data/attractions'
 
@@ -49,6 +49,14 @@ export function CalibrationPanel() {
               </button>
             ))}
           </div>
+          {calibratingZoneId && (() => {
+            const p = placeLatLng(calibratingZoneId)
+            return p ? (
+              <div className="mt-1 rounded-lg bg-ocean/5 ring-1 ring-ocean/20 px-2 py-1.5 font-mono text-[11px] text-ocean-deep select-all">
+                📌 {p.lat.toFixed(6)}, {p.lng.toFixed(6)}
+              </div>
+            ) : null
+          })()}
           <div className="text-muted/80 pt-0.5">Toạ độ lưu tự động (localStorage). Điểm chưa đặt sẽ theo toạ độ khu.</div>
         </div>
       )}
