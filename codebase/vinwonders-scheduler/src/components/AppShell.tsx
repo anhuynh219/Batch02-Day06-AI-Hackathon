@@ -1,6 +1,8 @@
 import { ChatPanel } from './ChatPanel'
 import { ParkMap } from './ParkMap'
 import { Timeline } from './Timeline'
+import { SurveyModal } from './Survey/SurveyModal'
+import { useStore } from '../store/useStore'
 
 function Logo() {
   return (
@@ -19,6 +21,8 @@ function Logo() {
 }
 
 export function AppShell() {
+  const openSurvey = useStore((s) => s.openSurvey)
+  const surveyOpen = useStore((s) => s.surveyOpen)
   return (
     <div className="tropic-bg grain relative h-full flex overflow-hidden">
       <aside className="relative z-10 w-[35%] min-w-[340px] flex flex-col bg-cream/95 backdrop-blur-sm border-r border-ink/10 shadow-[8px_0_30px_-20px_rgba(21,48,46,0.5)]">
@@ -31,6 +35,10 @@ export function AppShell() {
               <div className="text-[11px] font-semibold uppercase tracking-[0.22em] text-ocean-light">VinWonders · Phú Quốc</div>
               <h1 className="font-display text-2xl font-semibold leading-tight tracking-tight">Lịch Trình Vui Chơi</h1>
             </div>
+            <button onClick={openSurvey}
+              className="ml-auto self-start rounded-full bg-cream/15 px-3 py-1.5 text-[12px] font-semibold text-cream ring-1 ring-cream/30 backdrop-blur transition hover:bg-cream/25">
+              ✨ Cá nhân hoá
+            </button>
           </div>
           <p className="relative mt-1.5 text-[12.5px] leading-snug text-cream/80">
             Trợ lý AI xếp lịch theo thời gian &amp; sở thích của đoàn bạn.
@@ -52,6 +60,7 @@ export function AppShell() {
           <Timeline />
         </section>
       </main>
+      <SurveyModal key={surveyOpen ? 'open' : 'closed'} />
     </div>
   )
 }

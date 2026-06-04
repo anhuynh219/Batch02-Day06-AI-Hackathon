@@ -43,16 +43,22 @@ const responseSchema = {
   required: ['action', 'assistantText'],
 }
 
-function systemPrompt(menu: string): string {
+export function composeSystemInstruction(template: string, persona: string, menu: string): string {
+  const block = persona.trim() ? `\n\n# Hồ sơ khách\n${persona.trim()}\n` : ''
+  return `${template}${block}${menu}`
+}
+
+function systemPrompt(menu: string, persona: string): string {
   const filePath = path.join(__dirname, 'SYSTEM_PROMPT.md')
   const template = fs.readFileSync(filePath, 'utf8')
-  return `${template}${menu}`
+  return composeSystemInstruction(template, persona, menu)
 }
 
 export async function askGemini(opts: {
   messages: { role: 'user' | 'assistant'; text: string }[]
   itinerarySummary: string
   menu: string
+  persona?: string
 }): Promise<PlanResponse> {
   const contents = opts.messages.map((m) => ({
     role: m.role === 'assistant' ? 'model' : 'user',
@@ -67,7 +73,7 @@ export async function askGemini(opts: {
     model: MODEL,
     contents,
     config: {
-      systemInstruction: systemPrompt(opts.menu),
+      systemInstruction: systemPrompt(opts.menu, opts.persona ?? ''),
       responseMimeType: 'application/json',
       responseSchema,
     },

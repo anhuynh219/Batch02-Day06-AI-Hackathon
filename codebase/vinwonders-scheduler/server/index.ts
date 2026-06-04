@@ -18,12 +18,12 @@ const menu = ATTRACTIONS.map((a) => {
 }).join('\n')
 
 app.post('/api/plan', async (req, res) => {
-  const { messages = [], itinerarySummary = '' } = req.body ?? {}
+  const { messages = [], itinerarySummary = '', persona = '' } = req.body ?? {}
   try {
     let out: PlanResponse | null = null
     for (let attempt = 0; attempt < 2 && !out; attempt++) {
       try {
-        const r = await askGemini({ messages, itinerarySummary, menu })
+        const r = await askGemini({ messages, itinerarySummary, menu, persona })
         if (r.chosenIds) r.chosenIds = r.chosenIds.filter((id) => ATTRACTIONS_BY_ID[id])
         out = r
       } catch (e) {
