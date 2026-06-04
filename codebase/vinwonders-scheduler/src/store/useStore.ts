@@ -218,12 +218,12 @@ export const useStore = create<State>((set, get) => ({
       if (r.action === 'plan') get().resetConstraints()
       if (r.constraints) get().setConstraints(r.constraints)
       if (r.action === 'plan' || r.action === 'edit') {
-        const newEntries: PlanEntry[] = (r.chosenIds ?? []).map((id) => ({ kind: 'attraction', refId: id }))
-        for (const meal of r.constraints?.meals ?? []) {
-          const at = Math.floor(newEntries.length / 2)
-          newEntries.splice(at, 0, { kind: 'meal', meal, durationMin: 45 })
-        }
-        get().setEntries(newEntries)
+        const raw: PlanEntry[] = (r.chosenIds ?? []).map((id) => ({ kind: 'attraction', refId: id }))
+        for (const meal of r.constraints?.meals ?? []) raw.push({ kind: 'meal', meal, durationMin: 45 })
+        // Tự động sắp theo điểm gần nhất trước (nearest-neighbor từ cổng), giữ show đúng giờ
+        // và bữa ăn ở giữa — tránh lộ trình zigzag từ thứ tự thô của AI.
+        const ordered = optimizeEntries(raw, ATTRACTIONS_BY_ID, ENTRANCE.id, placeDistMeters)
+        get().setEntries(ordered)
       }
       set({ lastSuggestedIds: r.chosenIds ?? [] })
       get().pushMessage({ role: 'assistant', text: r.clarifyQuestion ? `${r.assistantText}\n${r.clarifyQuestion}` : r.assistantText })

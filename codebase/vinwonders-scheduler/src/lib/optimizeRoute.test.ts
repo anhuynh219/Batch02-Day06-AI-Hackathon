@@ -73,4 +73,12 @@ describe('optimizeEntries', () => {
     expect(mi).toBeGreaterThan(0)
     expect(mi).toBeLessThan(out.length - 1)
   })
+  it('orders movable attractions nearest-first from the entrance', () => {
+    const refs = out.filter((e) => e.kind === 'attraction').map((e: any) => e.refId)
+    // input order was [a2(B,9), a1(A,1), a3(A,1)]; nearest-first must visit the
+    // zone-A points (dist 1) before a2 (zone B, dist 9 — farthest)
+    expect(['a1', 'a3']).toContain(refs[0])
+    expect(refs.indexOf('a2')).toBeGreaterThan(refs.indexOf('a1'))
+    expect(refs.indexOf('a2')).toBeGreaterThan(refs.indexOf('a3'))
+  })
 })

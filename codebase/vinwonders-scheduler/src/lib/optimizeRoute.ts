@@ -89,11 +89,12 @@ function twoOpt(order: number[], M: number[][]): number[] {
   return seq
 }
 
-// ---- Reorder a plan so walking is minimised, starting & ending at the entrance ----
-// Rules (per product decision): only UNLOCKED, non-show attractions are reordered. They are
-// TSP-ordered POINT-TO-POINT (each attraction is its own node, using its own coordinate) so
-// the tour is the true shortest walk that starts & ends at the entrance — attractions that
-// happen to share a zone naturally end up adjacent because the hop between them is ~free.
+// ---- Reorder a plan: visit the NEAREST unvisited point first, then progressively farther ----
+// Rules (per product decision): only UNLOCKED, non-show attractions are reordered. Ordering is
+// greedy NEAREST-NEIGHBOUR starting from the entrance — from the current point we always hop to
+// the closest unvisited attraction (point-to-point, each attraction its own node). This is the
+// intuitive "gần nhất trước rồi xa dần" order and removes the back-tracking a raw AI order can
+// cause. Attractions sharing a zone naturally stay adjacent (hop between them ~free).
 // Shows keep their fixed times (appended late, by showtime). Meals go to the middle. Locked
 // items / breaks keep their order, appended after.
 export function optimizeEntries(
@@ -125,7 +126,7 @@ export function optimizeEntries(
   if (movable.length > 0) {
     const nodes = [entranceKey, ...movable.map((m) => m.key)]
     const M = nodes.map((a) => nodes.map((b) => dist(a, b)))
-    const order = tspOrder(movable.length, M) // indices into nodes (1..k)
+    const order = nearestNeighbour(movable.length, M) // greedy nearest-first from node 0 (entrance)
     movableOrdered = order.map((i) => movable[i - 1].entry)
   }
 
