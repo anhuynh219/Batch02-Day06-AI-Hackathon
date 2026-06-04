@@ -82,5 +82,17 @@ export function buildItinerary({ entries, constraints, attractions, travel, entr
       cursor = end
     }
   }
+
+  // Close the loop: always end the day back at the entrance / exit gate.
+  if (entrance && entries.length > 0) {
+    const buffer = travel(prevZone, entrance.zoneId)
+    const start = cursor + buffer
+    items.push({
+      id: nextId(), refId: null, type: 'return',
+      title: 'Về quầy vé / Cổng ra', zoneId: entrance.zoneId,
+      startTime: toHHMM(start), endTime: toHHMM(start), locked: true,
+      warning: start > departure ? 'Vượt quá giờ về dự kiến' : undefined,
+    })
+  }
   return items
 }

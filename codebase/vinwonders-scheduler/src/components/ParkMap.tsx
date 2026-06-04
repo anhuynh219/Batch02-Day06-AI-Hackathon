@@ -9,6 +9,16 @@ import { haversineMeters, walkMinutes } from '../engine/travel'
 
 const PARK_CENTER: [number, number] = [10.3373, 103.8539]
 
+// Khoá khung nhìn quanh khu VinWonders / đảo Phú Quốc: không cho zoom-out hay kéo bản đồ
+// ra khỏi vùng này (tránh hiển thị vùng biển / lãnh thổ ngoài đảo vì lý do nhạy cảm).
+// maxBounds = tường cứng (viscosity 1.0); minZoom giữ tầm nhìn luôn ở mức khu vực.
+const PARK_BOUNDS: [[number, number], [number, number]] = [
+  [10.320, 103.840], // SW
+  [10.356, 103.870], // NE
+]
+const MIN_ZOOM = 15
+const MAX_ZOOM = 19
+
 function styleFeature(f: any) {
   const p = f.properties || {}
   if (p.building) return { color: '#9aa6b2', weight: 1, fillColor: '#cdd6e0', fillOpacity: 0.6 }
@@ -74,6 +84,10 @@ export function ParkMap() {
     )
     .map((s, idx) => ({ ...s, idx: idx + 1 }))
 
+  // `stops` includes the closing return-to-entrance (so the route line loops back).
+  // Markers exclude it to avoid a duplicate pin stacked on the entrance.
+  const markerStops = stops.filter((s) => s.item.type !== 'return')
+
   // One route leg per consecutive pair, following the real walkways (Dijkstra over
   // the path graph; straight fallback when there's no path / graph yet). Each leg is
   // coloured by its DESTINATION zone so the route, pins and timeline cards share a
@@ -103,10 +117,20 @@ export function ParkMap() {
 
   return (
     <div className="relative h-full w-full">
-      <MapContainer center={PARK_CENTER} zoom={16} className="h-full w-full">
+      <MapContainer
+        center={PARK_CENTER}
+        zoom={16}
+        minZoom={MIN_ZOOM}
+        maxZoom={MAX_ZOOM}
+        maxBounds={PARK_BOUNDS}
+        maxBoundsViscosity={1.0}
+        className="h-full w-full"
+      >
         <TileLayer
           attribution='&copy; OpenStreetMap'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          bounds={PARK_BOUNDS}
+          noWrap
         />
         {geo && (
           <GeoJSON
@@ -145,7 +169,7 @@ export function ParkMap() {
             </Tooltip>
           </Polyline>
         ))}
-        {stops.map((s) => (
+        {markerStops.map((s) => (
           <Marker
             key={s.item.id}
             position={[s.p.lat, s.p.lng]}

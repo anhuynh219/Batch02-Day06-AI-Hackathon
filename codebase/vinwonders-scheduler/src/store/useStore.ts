@@ -3,8 +3,9 @@ import type { ItineraryItem, PlanEntry, UserConstraints } from '../types'
 import { buildItinerary } from '../engine/scheduleEngine'
 import { ATTRACTIONS_BY_ID } from '../data/attractions'
 import { ZONES_BY_ID, ENTRANCE } from '../data/zones'
-import { walkMinutes } from '../engine/travel'
+import { walkMinutes, haversineMeters } from '../engine/travel'
 import { getGraph, route, routedMinutes, loadGraphOnce } from '../lib/router'
+import { optimizeEntries } from '../lib/optimizeRoute'
 
 export type ChatMsg = { role: 'user' | 'assistant'; text: string }
 
@@ -35,6 +36,27 @@ const travel = (a: string | null, b: string | null) => {
   return walkMinutes(pa, pb)
 }
 
+// Real walking distance in METRES between two zones — cost metric for the TSP optimiser.
+const zoneDistMeters = (a: string, b: string) => {
+  if (!a || !b || a === b) return 0
+  const pa = zoneLatLng(a), pb = zoneLatLng(b)
+  if (!pa || !pb) return 0
+  const g = getGraph()
+  if (g) { const r = route(g, pa, pb); if (r) return r.distanceM }
+  return haversineMeters(pa, pb) * 1.3
+}
+
+function totalWalkMeters(itinerary: ItineraryItem[]): number {
+  let total = 0
+  let prev: string | null = null
+  for (const it of itinerary) {
+    if (!it.zoneId) continue
+    if (prev) total += zoneDistMeters(prev, it.zoneId)
+    prev = it.zoneId
+  }
+  return total
+}
+
 type State = {
   messages: ChatMsg[]
   constraints: UserConstraints
@@ -50,6 +72,7 @@ type State = {
   setConstraints: (c: Partial<UserConstraints>) => void
   setEntries: (e: PlanEntry[]) => void
   recompute: () => void
+  optimize: () => void
   removeItem: (id: string) => void
   toggleLock: (id: string) => void
   reorder: (fromId: string, toId: string) => void
@@ -82,12 +105,27 @@ export const useStore = create<State>((set, get) => ({
       entrance: { name: ENTRANCE.name, zoneId: ENTRANCE.id, durationMin: 10 },
     }),
   })),
+  // Reorder unlocked non-show attractions to minimise walking (TSP), keep shows at their
+  // fixed times, and close the loop back to the entrance. User-triggered (augmentation).
+  optimize: () => {
+    const before = totalWalkMeters(get().itinerary)
+    const next = optimizeEntries(get().entries, ATTRACTIONS_BY_ID, ENTRANCE.id, zoneDistMeters)
+    set({ entries: next })
+    get().recompute()
+    const after = totalWalkMeters(get().itinerary)
+    const km = (m: number) => (m / 1000).toFixed(2)
+    const saved = before - after
+    const note = saved > 10
+      ? `🧭 Đã tối ưu lộ trình — tổng đi bộ ${km(before)} km → ${km(after)} km (tiết kiệm ~${Math.round(saved)} m).`
+      : `🧭 Lộ trình đã gần tối ưu — tổng đi bộ ~${km(after)} km, kết thúc tại quầy vé.`
+    get().pushMessage({ role: 'assistant', text: note })
+  },
   // itinerary[0] is the fixed entrance stop (no matching PlanEntry); real items map
-  // to entries with a -offset shift. The entrance itself can't be removed/locked/moved.
+  // to entries with a -offset shift. Entrance/return stops can't be removed/locked/moved.
   removeItem: (id) => {
     const it = get().itinerary
     const idx = it.findIndex((i) => i.id === id)
-    if (idx < 0 || it[idx].type === 'entrance') return
+    if (idx < 0 || it[idx].type === 'entrance' || it[idx].type === 'return') return
     const offset = it[0]?.type === 'entrance' ? 1 : 0
     const entries = get().entries.slice()
     entries.splice(idx - offset, 1)
@@ -96,7 +134,7 @@ export const useStore = create<State>((set, get) => ({
   toggleLock: (id) => {
     const it = get().itinerary
     const idx = it.findIndex((i) => i.id === id)
-    if (idx < 0 || it[idx].type === 'entrance') return
+    if (idx < 0 || it[idx].type === 'entrance' || it[idx].type === 'return') return
     const offset = it[0]?.type === 'entrance' ? 1 : 0
     const ei = idx - offset
     const entries = get().entries.slice()
@@ -108,7 +146,8 @@ export const useStore = create<State>((set, get) => ({
     const from = it.findIndex((i) => i.id === fromId)
     const to = it.findIndex((i) => i.id === toId)
     if (from < 0 || to < 0) return
-    if (it[from].type === 'entrance' || it[to].type === 'entrance') return
+    const fixed = (t: string) => t === 'entrance' || t === 'return'
+    if (fixed(it[from].type) || fixed(it[to].type)) return
     const offset = it[0]?.type === 'entrance' ? 1 : 0
     const entries = get().entries.slice()
     const [moved] = entries.splice(from - offset, 1)

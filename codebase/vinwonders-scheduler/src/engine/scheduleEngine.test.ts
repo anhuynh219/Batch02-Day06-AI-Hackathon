@@ -104,4 +104,17 @@ describe('buildItinerary', () => {
     })
     expect(items).toEqual([])
   })
+
+  it('closes the loop with a return-to-entrance stop', () => {
+    const entries: PlanEntry[] = [{ kind: 'attraction', refId: 'r1' }] // zone A
+    const items = buildItinerary({
+      entries, constraints: baseConstraints, attractions: attrs, travel,
+      entrance: { name: 'Quầy vé', zoneId: 'GATE', durationMin: 10 },
+    })
+    const last = items[items.length - 1]
+    expect(last.type).toBe('return')
+    expect(last.zoneId).toBe('GATE')
+    // ride ends 09:50, travel A->GATE = 10 -> return at 10:00
+    expect(last.startTime).toBe('10:00')
+  })
 })

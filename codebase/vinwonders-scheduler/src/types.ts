@@ -25,7 +25,7 @@ export type Attraction = {
   showTimes?: string[] // only for kind==='show', e.g. ["18:30"]
 }
 
-export type ItineraryItemType = 'ride' | 'show' | 'meal' | 'break' | 'entrance'
+export type ItineraryItemType = 'ride' | 'show' | 'meal' | 'break' | 'entrance' | 'return'
 
 export type ItineraryItem = {
   id: string
