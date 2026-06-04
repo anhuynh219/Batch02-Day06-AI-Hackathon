@@ -49,4 +49,4 @@ Bạn bắt buộc phải phản hồi dưới dạng một đối tượng JSON
 }
 ```
 
-DANH SÁCH TRÒ CHƠI (id — tên — khu — loại — phút — cường độ — hợp trẻ em — giờ hoạt động):
+DANH SÁCH TRÒ CHƠI (id — tên — khu — loại — phút — cường độ — hợp trẻ em):
