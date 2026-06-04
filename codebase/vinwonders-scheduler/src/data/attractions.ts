@@ -5,9 +5,12 @@ const A = (
   id: string, name: string, zoneId: string,
   kind: Attraction['kind'], durationMin: number, intensity: Attraction['intensity'],
   kidFriendly: boolean, tags: string[], showTimes?: string[],
+  // Toạ độ riêng của điểm (tuỳ chọn). Bỏ trống -> dùng toạ độ khu. Cách dễ nhất để
+  // đặt: bật "📍 Chỉnh toạ độ điểm" trên bản đồ, chọn điểm rồi click (lưu localStorage).
+  latLng?: { lat: number; lng: number },
 ): Attraction => ({
   id, name, zoneId, kind, durationMin, intensity, kidFriendly, tags,
-  openTime: H.open, closeTime: kind === 'show' ? '19:30' : H.close, showTimes,
+  openTime: H.open, closeTime: kind === 'show' ? '19:30' : H.close, showTimes, latLng,
 })
 
 export const ATTRACTIONS: Attraction[] = [

@@ -12,7 +12,7 @@ const EXAMPLES = [
 
 export function ChatPanel() {
   const [input, setInput] = useState('')
-  const { messages, pushMessage, setConstraints, setEntries, entries, itinerary, busy, setBusy, lastSuggestedIds, setLastSuggestedIds } = useStore()
+  const { messages, pushMessage, setConstraints, resetConstraints, setEntries, itinerary, busy, setBusy, lastSuggestedIds, setLastSuggestedIds } = useStore()
 
   async function send(text?: string) {
     const value = (text ?? input).trim()
@@ -25,16 +25,18 @@ export function ChatPanel() {
     const history = [...messages, { role: 'user' as const, text: value }]
     try {
       const r = await requestPlan(history, summary)
+      if (r.action === 'plan') {
+        resetConstraints()
+      }
       if (r.constraints) setConstraints(r.constraints)
-      if (r.action !== 'clarify' && r.chosenIds?.length) {
-        const newEntries: PlanEntry[] = r.chosenIds.map((id) => ({ kind: 'attraction', refId: id }))
-        // insert meals roughly mid-day (engine times them in sequence)
+
+      if (r.action === 'plan' || r.action === 'edit') {
+        const newEntries: PlanEntry[] = (r.chosenIds ?? []).map((id) => ({ kind: 'attraction', refId: id }))
         for (const meal of r.constraints?.meals ?? []) {
           const at = Math.floor(newEntries.length / 2)
           newEntries.splice(at, 0, { kind: 'meal', meal, durationMin: 45 })
         }
-        // 'edit' merges with existing; 'plan' replaces
-        setEntries(r.action === 'edit' ? [...entries, ...newEntries] : newEntries)
+        setEntries(newEntries)
       }
       setLastSuggestedIds(r.chosenIds ?? [])
       pushMessage({ role: 'assistant', text: r.clarifyQuestion ? `${r.assistantText}\n${r.clarifyQuestion}` : r.assistantText })

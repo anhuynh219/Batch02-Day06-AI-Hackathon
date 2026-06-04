@@ -19,8 +19,13 @@ const baseConstraints: UserConstraints = {
   prefs: [], meals: [], mustDo: [], avoid: [],
 }
 
-// travel: 10 min between different zones, 0 if same
-const travel = (a: string | null, b: string | null) => (a && b && a !== b ? 10 : 0)
+// travel takes PLACE keys (attraction id or zone id). Resolve an attraction id to its
+// zone, then charge 10 min between different zones, 0 within the same zone.
+const zoneOf = (k: string | null) => (k ? (attrs[k]?.zoneId ?? k) : null)
+const travel = (a: string | null, b: string | null) => {
+  const za = zoneOf(a), zb = zoneOf(b)
+  return za && zb && za !== zb ? 10 : 0
+}
 
 describe('buildItinerary', () => {
   it('sequences two rides, no leading buffer, buffer between different zones', () => {
@@ -103,5 +108,18 @@ describe('buildItinerary', () => {
       entrance: { name: 'Quầy vé', zoneId: 'GATE', durationMin: 10 },
     })
     expect(items).toEqual([])
+  })
+
+  it('closes the loop with a return-to-entrance stop', () => {
+    const entries: PlanEntry[] = [{ kind: 'attraction', refId: 'r1' }] // zone A
+    const items = buildItinerary({
+      entries, constraints: baseConstraints, attractions: attrs, travel,
+      entrance: { name: 'Quầy vé', zoneId: 'GATE', durationMin: 10 },
+    })
+    const last = items[items.length - 1]
+    expect(last.type).toBe('return')
+    expect(last.zoneId).toBe('GATE')
+    // ride ends 09:50, travel A->GATE = 10 -> return at 10:00
+    expect(last.startTime).toBe('10:00')
   })
 })
