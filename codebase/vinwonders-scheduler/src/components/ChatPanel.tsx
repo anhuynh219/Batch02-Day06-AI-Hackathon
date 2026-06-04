@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { useStore } from '../store/useStore'
-import { requestPlan } from '../lib/aiClient'
 import { SuggestionCards } from './SuggestionCards'
-import type { PlanEntry } from '../types'
+import { StreamingText } from './StreamingText'
+import { GeneratingIndicator } from './GeneratingIndicator'
 
 const EXAMPLES = [
   'Đoàn 4 người có bé 6 tuổi, đến 9h về 15h, thích nhẹ nhàng và muốn xem show, ăn trưa ~12h.',
@@ -12,37 +12,13 @@ const EXAMPLES = [
 
 export function ChatPanel() {
   const [input, setInput] = useState('')
-  const { messages, pushMessage, setConstraints, setEntries, entries, itinerary, busy, setBusy, lastSuggestedIds, setLastSuggestedIds } = useStore()
+  const { messages, busy, lastSuggestedIds, runPlan } = useStore()
 
   async function send(text?: string) {
     const value = (text ?? input).trim()
     if (!value || busy) return
     setInput('')
-    pushMessage({ role: 'user', text: value })
-    setBusy(true)
-
-    const summary = itinerary.map((i) => `${i.startTime} ${i.title}`).join(', ')
-    const history = [...messages, { role: 'user' as const, text: value }]
-    try {
-      const r = await requestPlan(history, summary)
-      if (r.constraints) setConstraints(r.constraints)
-      if (r.action !== 'clarify' && r.chosenIds?.length) {
-        const newEntries: PlanEntry[] = r.chosenIds.map((id) => ({ kind: 'attraction', refId: id }))
-        // insert meals roughly mid-day (engine times them in sequence)
-        for (const meal of r.constraints?.meals ?? []) {
-          const at = Math.floor(newEntries.length / 2)
-          newEntries.splice(at, 0, { kind: 'meal', meal, durationMin: 45 })
-        }
-        // 'edit' merges with existing; 'plan' replaces
-        setEntries(r.action === 'edit' ? [...entries, ...newEntries] : newEntries)
-      }
-      setLastSuggestedIds(r.chosenIds ?? [])
-      pushMessage({ role: 'assistant', text: r.clarifyQuestion ? `${r.assistantText}\n${r.clarifyQuestion}` : r.assistantText })
-    } catch {
-      pushMessage({ role: 'assistant', text: 'Có lỗi kết nối, bạn thử lại nhé.' })
-    } finally {
-      setBusy(false)
-    }
+    await runPlan(value)
   }
 
   return (
@@ -74,22 +50,15 @@ export function ChatPanel() {
               m.role === 'user'
                 ? 'bg-gradient-to-br from-ocean to-ocean-deep text-cream rounded-2xl rounded-br-md'
                 : 'bg-cream ring-1 ring-ink/10 text-ink rounded-2xl rounded-bl-md'}`}>
-              {m.text}
+              {m.role === 'assistant' && i === messages.length - 1
+                ? <StreamingText text={m.text} />
+                : m.text}
             </div>
             {m.role === 'assistant' && i === messages.length - 1 && <SuggestionCards ids={lastSuggestedIds} />}
           </div>
         ))}
 
-        {busy && (
-          <div className="flex items-center gap-2 text-[13px] text-muted">
-            <span className="flex gap-1">
-              <span className="typing-dot h-2 w-2 rounded-full bg-coral" />
-              <span className="typing-dot h-2 w-2 rounded-full bg-mango" />
-              <span className="typing-dot h-2 w-2 rounded-full bg-ocean" />
-            </span>
-            AI đang xếp lịch…
-          </div>
-        )}
+        {busy && <GeneratingIndicator />}
       </div>
 
       <div className="p-3 border-t border-ink/10 bg-cream/70">

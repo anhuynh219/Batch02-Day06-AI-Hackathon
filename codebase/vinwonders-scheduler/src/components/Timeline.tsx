@@ -6,7 +6,7 @@ import { ZONES_BY_ID } from '../data/zones'
 import type { ItineraryItem } from '../types'
 
 const KIND_ICON: Record<string, string> = {
-  entrance: '🎟️', show: '🎆', meal: '🍜', break: '🌴', ride: '🎠',
+  entrance: '🎟️', return: '🏁', show: '🎆', meal: '🍜', break: '🌴', ride: '🎠',
 }
 
 function Card({ item, idx }: { item: ItineraryItem; idx: number }) {
@@ -17,6 +17,7 @@ function Card({ item, idx }: { item: ItineraryItem; idx: number }) {
   const selectedId = useStore((s) => s.selectedItemId)
 
   const isEntrance = item.type === 'entrance'
+  const isFixed = isEntrance || item.type === 'return'
   const zone = item.zoneId ? ZONES_BY_ID[item.zoneId] : null
   const color = zone?.color ?? '#5B7370'
   const selected = selectedId === item.id
@@ -39,7 +40,7 @@ function Card({ item, idx }: { item: ItineraryItem; idx: number }) {
       <div className="flex items-center justify-between gap-2">
         <span className="grid h-6 w-6 place-items-center rounded-full text-[11px] font-bold text-white shadow-sm" style={{ background: color }}>{idx}</span>
         <span className="font-mono text-[11px] tracking-tight text-muted">{item.startTime}<span className="text-ink/30">–</span>{item.endTime}</span>
-        {!isEntrance && (
+        {!isFixed && (
           <span {...attributes} {...listeners} className="ml-auto cursor-grab text-ink/25 hover:text-ink/50 transition" title="Kéo để sắp lại">⠿</span>
         )}
       </div>
@@ -47,7 +48,7 @@ function Card({ item, idx }: { item: ItineraryItem; idx: number }) {
       <div className="mt-1.5 font-semibold leading-snug text-ink">
         <span className="mr-1">{KIND_ICON[item.type] ?? '📍'}</span>{item.title}
       </div>
-      {zone && !isEntrance && <div className="text-[11px] text-muted mt-0.5">{zone.name}</div>}
+      {zone && !isFixed && <div className="text-[11px] text-muted mt-0.5">{zone.name}</div>}
 
       {item.warning && (
         <div className="mt-1.5 flex items-start gap-1 rounded-lg bg-coral/10 px-2 py-1 text-[11px] leading-tight text-coral-deep ring-1 ring-coral/20">
@@ -55,8 +56,8 @@ function Card({ item, idx }: { item: ItineraryItem; idx: number }) {
         </div>
       )}
 
-      {isEntrance ? (
-        <div className="mt-1.5 text-[11px] font-medium text-ocean-deep">Điểm bắt đầu</div>
+      {isFixed ? (
+        <div className="mt-1.5 text-[11px] font-medium text-ocean-deep">{isEntrance ? 'Điểm bắt đầu' : 'Điểm kết thúc'}</div>
       ) : (
         <div className="mt-2 flex gap-1.5 opacity-70 group-hover:opacity-100 transition">
           <button onClick={(e) => { e.stopPropagation(); toggleLock(item.id) }}
@@ -77,7 +78,9 @@ function Card({ item, idx }: { item: ItineraryItem; idx: number }) {
 export function Timeline() {
   const itinerary = useStore((s) => s.itinerary)
   const reorder = useStore((s) => s.reorder)
+  const optimize = useStore((s) => s.optimize)
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }))
+  const optimizable = itinerary.filter((i) => i.type === 'ride').length >= 2
 
   if (itinerary.length === 0)
     return (
@@ -93,7 +96,12 @@ export function Timeline() {
       <div className="flex items-center gap-2 mb-3">
         <h2 className="font-display text-lg font-semibold text-ink">Lịch trình trong ngày</h2>
         <span className="rounded-full bg-ocean/10 px-2 py-0.5 text-[11px] font-semibold text-ocean-deep">{itinerary.length} điểm</span>
-        <span className="ml-auto text-[11px] text-muted">Kéo thẻ để sắp lại · 🔒 khoá giờ</span>
+        <span className="hidden md:inline text-[11px] text-muted">Kéo thẻ để sắp lại · 🔒 khoá giờ</span>
+        <button onClick={optimize} disabled={!optimizable}
+          title="Sắp lại thứ tự để đi bộ ít nhất, giữ giờ show, kết thúc ở quầy vé"
+          className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-gradient-to-br from-ocean to-ocean-deep text-cream px-3 py-1.5 text-[12px] font-semibold shadow transition hover:shadow-lift hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-40 disabled:hover:translate-y-0">
+          🧭 Tối ưu lộ trình
+        </button>
       </div>
       <div className="flex-1 overflow-x-auto overflow-y-hidden">
         <DndContext sensors={sensors} collisionDetection={closestCenter}
