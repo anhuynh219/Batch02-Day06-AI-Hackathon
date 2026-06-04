@@ -99,8 +99,8 @@ Kế hoạch kiểm thử của chúng tôi bao gồm thực hiện các prompt 
 |---|---|
 | Huỳnh An Nghiệp - 2A202600853 | Demo, Frontend, thiết kế luồng AI |
 | Đỗ Thị Huyền - 2A202600880 | Testing hệ thống, dữ liệu |  
-| Nguyễn Hoàng Long - 2A202600785 | Testing hệ thống & làm spec  |  
-| Phùng Bá Quân - 2A202600866 | Testing hệ thống & làm slide |  
+| Nguyễn Hoàng Long - 2A202600785 | Testing hệ thống, làm spec  |  
+| Phùng Bá Quân - 2A202600866 | Testing hệ thống, làm slide |  
 | Phan Anh Thắng - 2A202600844 | Backend |  
 | Vũ Minh Duy - 2A202600806 | Tool | 
 
