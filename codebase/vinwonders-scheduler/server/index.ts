@@ -10,17 +10,20 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 
-const menu = ATTRACTIONS.map((a) =>
-  `${a.id} — ${a.name} — ${ZONES_BY_ID[a.zoneId].name} — ${a.kind} — ${a.durationMin}p — cường độ ${a.intensity} — ${a.kidFriendly ? 'hợp trẻ em' : 'không hợp trẻ nhỏ'}`,
-).join('\n')
+const menu = ATTRACTIONS.map((a) => {
+  const timeStr = a.showTimes && a.showTimes.length > 0
+    ? `giờ diễn: ${a.showTimes.join(', ')}`
+    : `mở: ${a.openTime} - đóng: ${a.closeTime}`
+  return `${a.id} — ${a.name} — ${ZONES_BY_ID[a.zoneId].name} — ${a.kind} — ${a.durationMin}p — cường độ ${a.intensity} — ${a.kidFriendly ? 'hợp trẻ em' : 'không hợp trẻ nhỏ'} — ${timeStr}`
+}).join('\n')
 
 app.post('/api/plan', async (req, res) => {
-  const { messages = [], itinerarySummary = '' } = req.body ?? {}
+  const { messages = [], itinerarySummary = '', persona = '' } = req.body ?? {}
   try {
     let out: PlanResponse | null = null
     for (let attempt = 0; attempt < 2 && !out; attempt++) {
       try {
-        const r = await askGemini({ messages, itinerarySummary, menu })
+        const r = await askGemini({ messages, itinerarySummary, menu, persona })
         if (r.chosenIds) r.chosenIds = r.chosenIds.filter((id) => ATTRACTIONS_BY_ID[id])
         out = r
       } catch (e) {

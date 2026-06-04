@@ -33,9 +33,12 @@ export type Attraction = {
   openTime: string    // "HH:MM"
   closeTime: string   // "HH:MM"
   showTimes?: string[] // only for kind==='show', e.g. ["18:30"]
+  // Toạ độ riêng của điểm. Nếu bỏ trống, dùng toạ độ của khu (zone). Có thể chỉnh
+  // trực tiếp trên bản đồ qua Calibration (lưu localStorage, ưu tiên cao hơn).
+  latLng?: { lat: number; lng: number }
 }
 
-export type ItineraryItemType = 'ride' | 'show' | 'meal' | 'break' | 'entrance'
+export type ItineraryItemType = 'ride' | 'show' | 'meal' | 'break' | 'entrance' | 'return'
 
 export type ItineraryItem = {
   id: string

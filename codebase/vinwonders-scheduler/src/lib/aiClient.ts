@@ -18,7 +18,8 @@ export function getSessionId() {
 export async function requestPlan(
   messages: { role: 'user' | 'assistant'; text: string }[],
   itinerarySummary: string,
-  clientTurnStartedAt: string,
+  persona = '',
+  clientTurnStartedAt = new Date().toISOString(),
 ): Promise<PlanResponse> {
   const res = await fetch('/api/plan', {
     method: 'POST',
@@ -26,6 +27,7 @@ export async function requestPlan(
     body: JSON.stringify({
       messages,
       itinerarySummary,
+      persona,
       sessionId: getSessionId(),
       userId: null,
       clientTurnStartedAt,

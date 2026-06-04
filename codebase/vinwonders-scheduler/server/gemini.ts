@@ -1,5 +1,11 @@
 import { GoogleGenAI, Type } from '@google/genai'
 import type { PlanResponse } from '../src/types'
+import fs from 'node:fs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! })
 const MODEL = process.env.GEMINI_MODEL || 'gemini-2.0-flash'
@@ -37,23 +43,22 @@ const responseSchema = {
   required: ['action', 'assistantText'],
 }
 
-function systemPrompt(menu: string): string {
-  return `Bạn là trợ lý lập lịch vui chơi tại VinWonders Phú Quốc. NHIỆM VỤ:
-- Đọc yêu cầu của khách (ngôn ngữ tự nhiên, tiếng Việt).
-- Trích "constraints" (giờ đến, giờ về, số người, có trẻ nhỏ, sở thích).
-- CHỌN trò chơi BẰNG ĐÚNG "id" trong DANH SÁCH dưới đây. TUYỆT ĐỐI KHÔNG bịa id hay tên mới, KHÔNG tự tính giờ (hệ thống khác lo việc tính giờ).
-- Nếu yêu cầu quá mơ hồ (vd "có trò nào vui không") -> action="clarify" và đặt 1-2 câu hỏi ngắn trong clarifyQuestion.
-- Nếu đã đủ thông tin -> action="plan" (lịch mới) hoặc "edit" (sửa lịch hiện có), điền chosenIds theo THỨ TỰ chơi hợp lý.
-- assistantText: lời nhắn thân thiện, ngắn gọn cho khách (giải thích vì sao chọn các trò này).
+export function composeSystemInstruction(template: string, persona: string, menu: string): string {
+  const block = persona.trim() ? `\n\n# Hồ sơ khách\n${persona.trim()}\n` : ''
+  return `${template}${block}${menu}`
+}
 
-DANH SÁCH TRÒ CHƠI (id — tên — khu — loại — phút — cường độ — hợp trẻ em):
-${menu}`
+function systemPrompt(menu: string, persona: string): string {
+  const filePath = path.join(__dirname, 'SYSTEM_PROMPT.md')
+  const template = fs.readFileSync(filePath, 'utf8')
+  return composeSystemInstruction(template, persona, menu)
 }
 
 export async function askGemini(opts: {
   messages: { role: 'user' | 'assistant'; text: string }[]
   itinerarySummary: string
   menu: string
+  persona?: string
 }): Promise<PlanResponse> {
   const contents = opts.messages.map((m) => ({
     role: m.role === 'assistant' ? 'model' : 'user',
@@ -68,7 +73,7 @@ export async function askGemini(opts: {
     model: MODEL,
     contents,
     config: {
-      systemInstruction: systemPrompt(opts.menu),
+      systemInstruction: systemPrompt(opts.menu, opts.persona ?? ''),
       responseMimeType: 'application/json',
       responseSchema,
     },

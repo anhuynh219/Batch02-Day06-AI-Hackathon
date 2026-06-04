@@ -1,13 +1,23 @@
 import { useEffect, useMemo, useState } from 'react'
 import { MapContainer, TileLayer, GeoJSON, Marker, Polyline, Popup, Tooltip, useMap } from 'react-leaflet'
 import L from 'leaflet'
-import { useStore, zoneLatLng } from '../store/useStore'
+import { useStore, placeLatLng } from '../store/useStore'
 import { ZONES_BY_ID } from '../data/zones'
 import { CalibrationClickLayer, CalibrationPanel } from './Calibration'
 import { loadGraphOnce, route, routedMinutes, type Graph } from '../lib/router'
 import { haversineMeters, walkMinutes } from '../engine/travel'
 
 const PARK_CENTER: [number, number] = [10.3373, 103.8539]
+
+// Khoá khung nhìn quanh khu VinWonders / đảo Phú Quốc: không cho zoom-out hay kéo bản đồ
+// ra khỏi vùng này (tránh hiển thị vùng biển / lãnh thổ ngoài đảo vì lý do nhạy cảm).
+// maxBounds = tường cứng (viscosity 1.0); minZoom giữ tầm nhìn luôn ở mức khu vực.
+const PARK_BOUNDS: [[number, number], [number, number]] = [
+  [10.320, 103.840], // SW
+  [10.356, 103.870], // NE
+]
+const MIN_ZOOM = 15
+const MAX_ZOOM = 19
 
 function styleFeature(f: any) {
   const p = f.properties || {}
@@ -36,8 +46,8 @@ function FlyToSelected() {
   const itinerary = useStore((s) => s.itinerary)
   useEffect(() => {
     const it = itinerary.find((i) => i.id === selectedId)
-    if (it?.zoneId) {
-      const p = zoneLatLng(it.zoneId)
+    if (it) {
+      const p = placeLatLng(it.refId ?? it.zoneId)
       if (p) map.flyTo([p.lat, p.lng], 17, { duration: 0.6 })
     }
   }, [selectedId, itinerary, map])
@@ -66,13 +76,44 @@ export function ParkMap() {
   const stops: StopEntry[] = itinerary
     .map((i) => ({
       item: i,
-      p: i.zoneId ? zoneLatLng(i.zoneId) : null,
+      // Position per-point: an attraction uses its own coordinate (falling back to its
+      // zone); meals/breaks/gate use their zone. Colour/label still come from the zone.
+      p: placeLatLng(i.refId ?? i.zoneId),
       z: i.zoneId ? ZONES_BY_ID[i.zoneId] : null,
     }))
     .filter((s): s is { item: typeof itinerary[number]; p: { lat: number; lng: number }; z: NonNullable<typeof ZONES_BY_ID[string]> } =>
       s.p !== null && s.z != null
     )
     .map((s, idx) => ({ ...s, idx: idx + 1 }))
+
+  // Fan out pins that resolve to the SAME coordinate (e.g. several attractions sharing a
+  // zone's fallback centre) into a small ring so they don't stack — like Google Maps'
+  // spiderfy. Applied to both pins and route legs (legs read s.p) so lines still touch the
+  // pins. Gate stops (entrance/return) stay put. Each s here is a fresh object, and we
+  // reassign s.p to a NEW object, so the underlying zone/attraction coordinates aren't mutated.
+  {
+    const groups = new Map<string, StopEntry[]>()
+    for (const s of stops) {
+      if (s.item.type === 'entrance' || s.item.type === 'return') continue
+      const key = `${s.p.lat.toFixed(5)},${s.p.lng.toFixed(5)}`
+      const g = groups.get(key)
+      if (g) g.push(s)
+      else groups.set(key, [s])
+    }
+    for (const g of groups.values()) {
+      if (g.length < 2) continue
+      const R = 0.00022 // ~24 m ring radius
+      const lngScale = Math.cos((g[0].p.lat * Math.PI) / 180) || 1
+      g.forEach((s, i) => {
+        const ang = (2 * Math.PI * i) / g.length - Math.PI / 2
+        s.p = { lat: s.p.lat + R * Math.sin(ang), lng: s.p.lng + (R / lngScale) * Math.cos(ang) }
+      })
+    }
+  }
+
+  // `stops` includes the closing return-to-entrance (so the route line loops back).
+  // Markers exclude it to avoid a duplicate pin stacked on the entrance.
+  const markerStops = stops.filter((s) => s.item.type !== 'return')
 
   // One route leg per consecutive pair, following the real walkways (Dijkstra over
   // the path graph; straight fallback when there's no path / graph yet). Each leg is
@@ -103,10 +144,20 @@ export function ParkMap() {
 
   return (
     <div className="relative h-full w-full">
-      <MapContainer center={PARK_CENTER} zoom={16} className="h-full w-full">
+      <MapContainer
+        center={PARK_CENTER}
+        zoom={16}
+        minZoom={MIN_ZOOM}
+        maxZoom={MAX_ZOOM}
+        maxBounds={PARK_BOUNDS}
+        maxBoundsViscosity={1.0}
+        className="h-full w-full"
+      >
         <TileLayer
           attribution='&copy; OpenStreetMap'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          bounds={PARK_BOUNDS}
+          noWrap
         />
         {geo && (
           <GeoJSON
@@ -145,7 +196,7 @@ export function ParkMap() {
             </Tooltip>
           </Polyline>
         ))}
-        {stops.map((s) => (
+        {markerStops.map((s) => (
           <Marker
             key={s.item.id}
             position={[s.p.lat, s.p.lng]}

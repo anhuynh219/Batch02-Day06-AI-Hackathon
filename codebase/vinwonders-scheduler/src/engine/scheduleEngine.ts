@@ -8,7 +8,8 @@ type Args = {
   entries: PlanEntry[]
   constraints: UserConstraints
   attractions: Record<string, Attraction>
-  travel: (zoneA: string | null, zoneB: string | null) => number
+  // Thời gian đi bộ giữa hai "điểm" (khoá điểm = id của trò, hoặc id khu cho bữa ăn/cổng).
+  travel: (placeA: string | null, placeB: string | null) => number
   // Điểm bắt đầu cố định (quầy vé). Nếu có và có ít nhất 1 entry, lịch luôn mở đầu từ đây.
   entrance?: { name: string; zoneId: string; durationMin: number }
 }
@@ -17,6 +18,9 @@ export function buildItinerary({ entries, constraints, attractions, travel, entr
   const items: ItineraryItem[] = []
   const departure = toMinutes(constraints.departureTime)
   let cursor = toMinutes(constraints.arrivalTime)
+  // Khoá của điểm trước đó (id trò ưu tiên, để tính đi bộ chính xác theo từng điểm).
+  let prevKey: string | null = null
+  // Khu của điểm trước đó (dùng cho zoneId hiển thị của mục Nghỉ ngơi).
   let prevZone: string | null = null
 
   if (entrance && entries.length > 0) {
@@ -28,6 +32,7 @@ export function buildItinerary({ entries, constraints, attractions, travel, entr
       startTime: toHHMM(start), endTime: toHHMM(end), locked: true,
     })
     cursor = end
+    prevKey = entrance.zoneId
     prevZone = entrance.zoneId
   }
 
@@ -35,7 +40,7 @@ export function buildItinerary({ entries, constraints, attractions, travel, entr
     if (entry.kind === 'attraction') {
       const a = attractions[entry.refId]
       if (!a) continue
-      const buffer = travel(prevZone, a.zoneId)
+      const buffer = travel(prevKey, a.id)
       let start = cursor + buffer
       const warnings: string[] = []
 
@@ -57,9 +62,10 @@ export function buildItinerary({ entries, constraints, attractions, travel, entr
         locked: !!entry.locked, warning: warnings[0],
       })
       cursor = end
+      prevKey = a.id
       prevZone = a.zoneId
     } else if (entry.kind === 'meal') {
-      const buffer = travel(prevZone, entry.zoneId ?? prevZone)
+      const buffer = travel(prevKey, entry.zoneId ?? prevKey)
       const start = cursor + buffer
       const end = start + entry.durationMin
       const warning = end > departure ? 'Vượt quá giờ về dự kiến' : undefined
@@ -70,6 +76,7 @@ export function buildItinerary({ entries, constraints, attractions, travel, entr
         locked: !!entry.locked, warning,
       })
       cursor = end
+      prevKey = entry.zoneId ?? prevKey
       prevZone = entry.zoneId ?? prevZone
     } else {
       const start = cursor
@@ -81,6 +88,18 @@ export function buildItinerary({ entries, constraints, attractions, travel, entr
       })
       cursor = end
     }
+  }
+
+  // Close the loop: always end the day back at the entrance / exit gate.
+  if (entrance && entries.length > 0) {
+    const buffer = travel(prevKey, entrance.zoneId)
+    const start = cursor + buffer
+    items.push({
+      id: nextId(), refId: null, type: 'return',
+      title: 'Về quầy vé / Cổng ra', zoneId: entrance.zoneId,
+      startTime: toHHMM(start), endTime: toHHMM(start), locked: true,
+      warning: start > departure ? 'Vượt quá giờ về dự kiến' : undefined,
+    })
   }
   return items
 }
