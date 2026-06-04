@@ -1,8 +1,6 @@
 import { useState } from 'react'
 import { useStore } from '../store/useStore'
-import { requestPlan } from '../lib/aiClient'
 import { SuggestionCards } from './SuggestionCards'
-import type { PlanEntry } from '../types'
 
 const EXAMPLES = [
   'Đoàn 4 người có bé 6 tuổi, đến 9h về 15h, thích nhẹ nhàng và muốn xem show, ăn trưa ~12h.',
@@ -12,39 +10,13 @@ const EXAMPLES = [
 
 export function ChatPanel() {
   const [input, setInput] = useState('')
-  const { messages, pushMessage, setConstraints, resetConstraints, setEntries, itinerary, busy, setBusy, lastSuggestedIds, setLastSuggestedIds } = useStore()
+  const { messages, busy, lastSuggestedIds, runPlan } = useStore()
 
   async function send(text?: string) {
     const value = (text ?? input).trim()
     if (!value || busy) return
     setInput('')
-    pushMessage({ role: 'user', text: value })
-    setBusy(true)
-
-    const summary = itinerary.map((i) => `${i.startTime} ${i.title}`).join(', ')
-    const history = [...messages, { role: 'user' as const, text: value }]
-    try {
-      const r = await requestPlan(history, summary)
-      if (r.action === 'plan') {
-        resetConstraints()
-      }
-      if (r.constraints) setConstraints(r.constraints)
-
-      if (r.action === 'plan' || r.action === 'edit') {
-        const newEntries: PlanEntry[] = (r.chosenIds ?? []).map((id) => ({ kind: 'attraction', refId: id }))
-        for (const meal of r.constraints?.meals ?? []) {
-          const at = Math.floor(newEntries.length / 2)
-          newEntries.splice(at, 0, { kind: 'meal', meal, durationMin: 45 })
-        }
-        setEntries(newEntries)
-      }
-      setLastSuggestedIds(r.chosenIds ?? [])
-      pushMessage({ role: 'assistant', text: r.clarifyQuestion ? `${r.assistantText}\n${r.clarifyQuestion}` : r.assistantText })
-    } catch {
-      pushMessage({ role: 'assistant', text: 'Có lỗi kết nối, bạn thử lại nhé.' })
-    } finally {
-      setBusy(false)
-    }
+    await runPlan(value)
   }
 
   return (

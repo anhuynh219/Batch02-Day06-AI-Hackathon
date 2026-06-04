@@ -6,6 +6,9 @@ import { ZONES_BY_ID, ENTRANCE } from '../data/zones'
 import { walkMinutes, haversineMeters } from '../engine/travel'
 import { getGraph, route, routedMinutes, loadGraphOnce } from '../lib/router'
 import { optimizeEntries } from '../lib/optimizeRoute'
+import { requestPlan } from '../lib/aiClient'
+import type { SurveyProfile } from '../survey/types'
+import { toConstraints, toPersona, toSeedPrompt } from '../survey/profileMapping'
 
 export type ChatMsg = { role: 'user' | 'assistant'; text: string }
 
@@ -88,6 +91,14 @@ type State = {
   calibrating: boolean
   calibratingZoneId: string | null
   lastSuggestedIds: string[]
+  profile: SurveyProfile | null
+  persona: string
+  surveyOpen: boolean
+  surveyDone: boolean
+  runPlan: (text: string) => Promise<void>
+  completeSurvey: (profile: SurveyProfile) => Promise<void>
+  skipSurvey: () => void
+  openSurvey: () => void
   pushMessage: (m: ChatMsg) => void
   setConstraints: (c: Partial<UserConstraints>) => void
   resetConstraints: () => void
@@ -116,6 +127,10 @@ export const useStore = create<State>((set, get) => ({
   calibrating: false,
   calibratingZoneId: null,
   lastSuggestedIds: [],
+  profile: JSON.parse(localStorage.getItem('surveyProfile') || 'null'),
+  persona: (() => { const p = JSON.parse(localStorage.getItem('surveyProfile') || 'null'); return p ? toPersona(p) : '' })(),
+  surveyOpen: !localStorage.getItem('surveyDone'),
+  surveyDone: !!localStorage.getItem('surveyDone'),
   pushMessage: (m) => set((s) => ({ messages: [...s.messages, m] })),
   setConstraints: (c) => set((s) => ({ constraints: { ...s.constraints, ...c } })),
   resetConstraints: () => set({ constraints: DEFAULT_CONSTRAINTS }),
@@ -186,6 +201,44 @@ export const useStore = create<State>((set, get) => ({
   setCalibrating: (b) => set({ calibrating: b }),
   setCalibratingZone: (id) => set({ calibratingZoneId: id }),
   setLastSuggestedIds: (ids) => set({ lastSuggestedIds: ids }),
+  runPlan: async (text) => {
+    const value = text.trim()
+    if (!value || get().busy) return
+    const prevMessages = get().messages
+    get().pushMessage({ role: 'user', text: value })
+    set({ busy: true })
+    const summary = get().itinerary.map((i) => `${i.startTime} ${i.title}`).join(', ')
+    const history = [...prevMessages, { role: 'user' as const, text: value }]
+    try {
+      const r = await requestPlan(history, summary, get().persona)
+      if (r.action === 'plan') get().resetConstraints()
+      if (r.constraints) get().setConstraints(r.constraints)
+      if (r.action === 'plan' || r.action === 'edit') {
+        const newEntries: PlanEntry[] = (r.chosenIds ?? []).map((id) => ({ kind: 'attraction', refId: id }))
+        for (const meal of r.constraints?.meals ?? []) {
+          const at = Math.floor(newEntries.length / 2)
+          newEntries.splice(at, 0, { kind: 'meal', meal, durationMin: 45 })
+        }
+        get().setEntries(newEntries)
+      }
+      set({ lastSuggestedIds: r.chosenIds ?? [] })
+      get().pushMessage({ role: 'assistant', text: r.clarifyQuestion ? `${r.assistantText}\n${r.clarifyQuestion}` : r.assistantText })
+    } catch {
+      get().pushMessage({ role: 'assistant', text: 'Có lỗi kết nối, bạn thử lại nhé.' })
+    } finally {
+      set({ busy: false })
+    }
+  },
+  completeSurvey: async (profile) => {
+    const persona = toPersona(profile)
+    localStorage.setItem('surveyProfile', JSON.stringify(profile))
+    localStorage.setItem('surveyDone', '1')
+    set({ profile, persona, surveyDone: true, surveyOpen: false })
+    get().setConstraints(toConstraints(profile))
+    await get().runPlan(toSeedPrompt(profile))
+  },
+  skipSurvey: () => { localStorage.setItem('surveyDone', '1'); set({ surveyDone: true, surveyOpen: false }) },
+  openSurvey: () => set({ surveyOpen: true }),
 }))
 
 // Load the walkway graph once; when ready, recompute so travel times reflect
