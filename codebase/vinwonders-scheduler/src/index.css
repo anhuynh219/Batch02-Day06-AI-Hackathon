@@ -1,0 +1,96 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html, body, #root { height: 100%; margin: 0; }
+  body {
+    font-family: 'Be Vietnam Pro', ui-sans-serif, system-ui, sans-serif;
+    color: #15302E;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  h1, h2, h3 { font-family: 'Fraunces', ui-serif, Georgia, serif; }
+}
+
+@layer components {
+  /* Warm sand canvas with a soft sunset bloom + faint grain for atmosphere */
+  .tropic-bg {
+    background-color: #FAF4E8;
+    background-image:
+      radial-gradient(1100px 520px at 88% -8%, rgba(255, 168, 120, 0.30), transparent 60%),
+      radial-gradient(900px 480px at -6% 6%, rgba(95, 179, 176, 0.28), transparent 58%),
+      radial-gradient(760px 620px at 60% 116%, rgba(14, 124, 123, 0.16), transparent 60%);
+  }
+  .grain::after {
+    content: '';
+    position: absolute; inset: 0; pointer-events: none; z-index: 0;
+    opacity: 0.5; mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E");
+  }
+
+  /* Staggered reveal helper */
+  .reveal { animation: fade-up 0.55s cubic-bezier(0.22,1,0.36,1) both; }
+}
+
+/* Refined scrollbars in the warm palette */
+*::-webkit-scrollbar { width: 9px; height: 9px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb {
+  background: rgba(14, 124, 123, 0.28); border-radius: 999px;
+  border: 2px solid transparent; background-clip: padding-box;
+}
+*::-webkit-scrollbar-thumb:hover { background: rgba(14, 124, 123, 0.5); background-clip: padding-box; }
+
+/* Typing indicator dots */
+.typing-dot { animation: dot 1.2s infinite ease-in-out; }
+.typing-dot:nth-child(2) { animation-delay: 0.18s; }
+.typing-dot:nth-child(3) { animation-delay: 0.36s; }
+
+/* ---- Leaflet theming to match the tropical palette ---- */
+.leaflet-container { font-family: 'Be Vietnam Pro', sans-serif; background: #dfe9e6; }
+.leaflet-popup-content-wrapper {
+  border-radius: 14px; box-shadow: 0 14px 36px -14px rgba(21,48,46,0.5);
+  border: 1px solid rgba(14,124,123,0.18);
+}
+.leaflet-popup-content { margin: 12px 14px; font-size: 12.5px; color: #15302E; line-height: 1.45; }
+.leaflet-popup-tip { box-shadow: none; }
+.leaflet-bar a, .leaflet-touch .leaflet-bar a {
+  color: #0B5E5E; border-radius: 8px;
+}
+.map-pin {
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; color: #fff; border-radius: 999px;
+  border: 2.5px solid #FFFDF8; box-shadow: 0 4px 12px rgba(21,48,46,0.45);
+  font-family: 'Be Vietnam Pro', sans-serif;
+}
+.map-pin::after {
+  content: ''; position: absolute; bottom: -7px; left: 50%; transform: translateX(-50%);
+  border-left: 5px solid transparent; border-right: 5px solid transparent;
+  border-top: 7px solid var(--pin, #15302E);
+}
+/* Route-leg hover tooltip */
+.leaflet-tooltip.leg-tip {
+  background: #15302E; color: #FFFDF8; border: none; border-radius: 10px;
+  padding: 7px 10px; font-size: 12px; line-height: 1.35; font-weight: 500;
+  box-shadow: 0 10px 24px -10px rgba(0,0,0,0.55); white-space: nowrap;
+}
+.leaflet-tooltip.leg-tip::before { border-top-color: #15302E; }
+.leg-tip-time { font-weight: 800; color: #FFD27A; }
+.leg-tip-dist { color: #9FE0DC; }
+.leg-tip-route { font-size: 11px; color: rgba(255,253,248,0.78); margin-top: 1px; }
+.leg-tip-note { font-size: 10.5px; color: #FFB59E; margin-top: 1px; }
+
+/* Pin hover tooltip (name + time) */
+.leaflet-tooltip.pin-tip {
+  background: #FFFDF8; color: #15302E; border: 1px solid rgba(14,124,123,0.18);
+  border-radius: 12px; padding: 7px 10px; box-shadow: 0 10px 26px -12px rgba(21,48,46,0.55);
+  font-family: 'Be Vietnam Pro', sans-serif; white-space: nowrap;
+}
+.leaflet-tooltip.pin-tip::before { border-top-color: #FFFDF8; }
+.pin-tip-title { display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 12.5px; }
+.pin-tip-num {
+  display: inline-grid; place-items: center; width: 18px; height: 18px; border-radius: 999px;
+  color: #fff; font-size: 11px; font-weight: 800;
+}
+.pin-tip-sub { display: block; margin-top: 2px; font-size: 11px; color: #5B7370; }
