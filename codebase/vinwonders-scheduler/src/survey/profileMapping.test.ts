@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { toConstraints } from './profileMapping'
+import { toConstraints, toPersona, toSeedPrompt } from './profileMapping'
 import type { SurveyProfile } from './types'
 
 const base: SurveyProfile = {
@@ -31,5 +31,26 @@ describe('toConstraints', () => {
   it('maps only attraction-relevant avoid keys (heights), not dietary', () => {
     const c = toConstraints({ ...base, avoid: ['heights', 'vegetarian'] })
     expect(c.avoid).toEqual(['trò chơi trên cao / độ cao'])
+  })
+})
+
+describe('toPersona', () => {
+  it('summarises group, intensity, interests, pace and avoid', () => {
+    const s = toPersona(base)
+    expect(s).toContain('cặp đôi')
+    expect(s).toContain('thích cảm giác mạnh')
+    expect(s).toContain('công viên nước')
+    expect(s).toContain('thong thả')
+    expect(s).toContain('tránh')
+    expect(s.endsWith('.')).toBe(true)
+  })
+})
+
+describe('toSeedPrompt', () => {
+  it('produces a natural request with the time window and an ask to plan', () => {
+    const s = toSeedPrompt(base)
+    expect(s).toContain('09:00')
+    expect(s).toContain('19:00')
+    expect(s.toLowerCase()).toContain('lên lịch')
   })
 })

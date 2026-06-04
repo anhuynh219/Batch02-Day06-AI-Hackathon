@@ -52,3 +52,33 @@ export function toConstraints(p: SurveyProfile): Partial<UserConstraints> {
   const avoid = p.avoid.map((a) => AVOID_ATTRACTION[a]).filter(Boolean)
   return { arrivalTime, departureTime, groupSize, hasKids, prefs, avoid, meals: mealsForWindow(arrivalTime, departureTime) }
 }
+
+export function toPersona(p: SurveyProfile): string {
+  const parts: string[] = [
+    GROUP_LABEL[p.groupType],
+    p.groupType === 'family' ? 'có trẻ nhỏ' : 'không trẻ nhỏ',
+    INTENSITY_PREF[p.intensity],
+  ]
+  const interests = p.interests.map((i) => INTEREST_PREF[i]).filter(Boolean)
+  if (interests.length) parts.push('thích ' + interests.join(', '))
+  parts.push('nhịp độ ' + PACE_LABEL[p.pace])
+  const av = p.avoid.map((a) => AVOID_ATTRACTION[a]).filter(Boolean)
+  if (av.length) parts.push('tránh ' + av.join(', '))
+  const diet = p.avoid.map((a) => DIET_LABEL[a]).filter(Boolean)
+  if (diet.length) parts.push(diet.join(', '))
+  return parts.join(', ') + '.'
+}
+
+export function toSeedPrompt(p: SurveyProfile): string {
+  const { arrivalTime, departureTime } = TIME_RANGES[p.timeRange]
+  const interests = p.interests.map((i) => INTEREST_PREF[i]).filter(Boolean).join(', ')
+  const av = p.avoid.map((a) => AVOID_ATTRACTION[a]).filter(Boolean)
+  const diet = p.avoid.map((a) => DIET_LABEL[a]).filter(Boolean)
+  let s = `Mình là ${GROUP_LABEL[p.groupType]}${p.groupType === 'family' ? ' (có trẻ nhỏ)' : ''}, chơi từ ${arrivalTime} đến ${departureTime}. ${INTENSITY_PREF[p.intensity]}`
+  if (interests) s += `, đặc biệt thích ${interests}`
+  s += `. Nhịp độ ${PACE_LABEL[p.pace]}.`
+  if (av.length) s += ` Tránh giúp mình ${av.join(', ')}.`
+  if (diet.length) s += ` Lưu ý ăn uống: ${diet.join(', ')}.`
+  s += ' Hãy lên lịch trình phù hợp.'
+  return s
+}
