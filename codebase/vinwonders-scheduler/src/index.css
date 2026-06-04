@@ -47,6 +47,29 @@
 .typing-dot:nth-child(2) { animation-delay: 0.18s; }
 .typing-dot:nth-child(3) { animation-delay: 0.36s; }
 
+/* Streaming (typewriter) caret for AI replies */
+.stream-caret {
+  display: inline-block; width: 2px; height: 1.05em; margin-left: 2px;
+  background: #FF6B4A; vertical-align: text-bottom; border-radius: 1px;
+  animation: caret-blink 0.9s steps(1) infinite;
+}
+@keyframes caret-blink { 0%, 50% { opacity: 1; } 50.01%, 100% { opacity: 0; } }
+
+/* Shimmering status text while the AI is generating */
+.shimmer-text {
+  background: linear-gradient(90deg, #5B7370 0%, #FF6B4A 45%, #FFD27A 55%, #5B7370 100%);
+  background-size: 220% 100%;
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; color: transparent;
+  animation: shimmer 1.9s linear infinite;
+}
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .stream-caret, .shimmer-text { animation: none; }
+  .shimmer-text { -webkit-text-fill-color: #5B7370; color: #5B7370; }
+}
+
 /* ---- Leaflet theming to match the tropical palette ---- */
 .leaflet-container { font-family: 'Be Vietnam Pro', sans-serif; background: #dfe9e6; }
 .leaflet-popup-content-wrapper {
