@@ -1,0 +1,796 @@
+{
+  "hours": {
+    "open": "09:00",
+    "close": "19:30"
+  },
+  "entrance": {
+    "id": "entrance",
+    "name": "Quầy vé / Cổng vào",
+    "color": "#334155",
+    "latLng": {
+      "lat": 10.340782,
+      "lng": 103.853981
+    },
+    "shortDesc": "Điểm bắt đầu — mua vé và vào cổng"
+  },
+  "zones": [
+    {
+      "id": "european",
+      "name": "Đại lộ châu Âu",
+      "color": "#e0533d",
+      "latLng": {
+        "lat": 10.3376,
+        "lng": 103.8547
+      },
+      "shortDesc": "Phố châu Âu trung cổ, show Once, lâu đài",
+      "aliases": [
+        "Đại Lộ Châu Âu",
+        "European Avenue",
+        "European Street",
+        "Europe Avenue"
+      ],
+      "description": "Khu phố châu Âu trung cổ với lâu đài, quảng trường, các điểm check-in và Show Once vào buổi tối.",
+      "highlights": [
+        "Phố châu Âu trung cổ",
+        "Lâu đài và quảng trường check-in",
+        "Show Once"
+      ],
+      "suitableAudience": "Phù hợp gia đình, nhóm thích đi dạo, check-in và xem show.",
+      "suggestedDurationMin": 45
+    },
+    {
+      "id": "tornado",
+      "name": "Thế giới lốc xoáy",
+      "color": "#2f9fd0",
+      "latLng": {
+        "lat": 10.33846,
+        "lng": 103.853269
+      },
+      "shortDesc": "Công viên nước lớn nhất ĐNA",
+      "aliases": [
+        "Typhoon World",
+        "Công viên nước",
+        "Thế giới nước",
+        "Water Park",
+        "Tornado World"
+      ],
+      "description": "Khu công viên nước với các đường trượt, hồ sóng và trò chơi nước cho gia đình lẫn nhóm thích cảm giác mạnh.",
+      "highlights": [
+        "Công viên nước",
+        "Sóng thần Oahu",
+        "Các đường trượt nước"
+      ],
+      "suitableAudience": "Phù hợp nhóm thích chơi nước, gia đình và khách muốn dành nhiều thời gian ngoài trời.",
+      "suggestedDurationMin": 90
+    },
+    {
+      "id": "viking",
+      "name": "Khu làng bí mật",
+      "color": "#d0a02f",
+      "latLng": {
+        "lat": 10.3382,
+        "lng": 103.8536
+      },
+      "shortDesc": "Làng Viking, zipline, thử thách vận động",
+      "aliases": [
+        "Làng Viking",
+        "Khu làng Viking",
+        "Viking Village",
+        "Làng bí mật"
+      ],
+      "description": "Khu chủ đề Viking với các hoạt động vận động, thử thách ngoài trời và zipline xuyên rừng.",
+      "highlights": [
+        "Không gian chủ đề Viking",
+        "Zipline xuyên rừng",
+        "Các thử thách vận động"
+      ],
+      "suitableAudience": "Phù hợp gia đình năng động và nhóm thích vận động ngoài trời.",
+      "suggestedDurationMin": 60
+    },
+    {
+      "id": "neptune",
+      "name": "Cung điện Hải Vương",
+      "color": "#46b37a",
+      "latLng": {
+        "lat": 10.33605,
+        "lng": 103.85306
+      },
+      "shortDesc": "Cung Điện Hải Vương là biểu tượng nổi bật nhất của VinWonders Phú Quốc với kiến trúc hình rùa biển khổng lồ. Đây là một trong những thủy cung lớn nhất khu vực, nơi sinh sống của hàng chục nghìn sinh vật biển thuộc nhiều hệ sinh thái khác nhau. Bên trong được chia thành nhiều khu vực như thế giới cá mập, thế giới chim cánh cụt, vương quốc cá khổng lồ và khu san hô nhiệt đới. Du khách có thể đi qua đường hầm đại dương, xem chương trình biểu diễn nàng tiên cá, hoạt động cho cá ăn và khám phá vẻ đẹp kỳ thú của thế giới dưới nước. Đây là địa điểm phù hợp cho mọi lứa tuổi và thường được lựa chọn làm điểm dừng chân thư giãn sau khi tham gia các trò chơi ngoài trời.",
+      "aliases": [
+        "Cung Điện Hải Vương",
+        "Cung điện Hải Vương",
+        "Thủy cung",
+        "Thuy cung",
+        "Aquarium",
+        "Neptune Palace",
+        "Sea Shell"
+      ],
+      "description": "Cung Điện Hải Vương là biểu tượng nổi bật nhất của VinWonders Phú Quốc với kiến trúc hình rùa biển khổng lồ. Đây là một trong những thủy cung lớn nhất khu vực, nơi sinh sống của hàng chục nghìn sinh vật biển thuộc nhiều hệ sinh thái khác nhau. Bên trong được chia thành nhiều khu vực như thế giới cá mập, thế giới chim cánh cụt, vương quốc cá khổng lồ và khu san hô nhiệt đới. Du khách có thể đi qua đường hầm đại dương, xem chương trình biểu diễn nàng tiên cá, hoạt động cho cá ăn và khám phá vẻ đẹp kỳ thú của thế giới dưới nước. Đây là địa điểm phù hợp cho mọi lứa tuổi và thường được lựa chọn làm điểm dừng chân thư giãn sau khi tham gia các trò chơi ngoài trời.",
+      "highlights": [
+        "Kiến trúc hình rùa biển khổng lồ",
+        "Đường hầm đại dương",
+        "Khu cá mập, chim cánh cụt, cá khổng lồ và san hô nhiệt đới",
+        "Biểu diễn nàng tiên cá và hoạt động cho cá ăn"
+      ],
+      "suitableAudience": "Phù hợp mọi lứa tuổi, gia đình có trẻ nhỏ và khách muốn nghỉ chân trong không gian trong nhà.",
+      "suggestedDurationMin": 50
+    },
+    {
+      "id": "adventure",
+      "name": "Thế giới phiêu lưu",
+      "color": "#7a5cd0",
+      "latLng": {
+        "lat": 10.3365,
+        "lng": 103.8555
+      },
+      "shortDesc": "Maya, Hy Lạp, rừng Amazon, tàu lượn Zeus",
+      "aliases": [
+        "Thế Giới Phiêu Lưu",
+        "Adventure World",
+        "Adventure Land",
+        "Khu phiêu lưu"
+      ],
+      "description": "Khu trò chơi cảm giác mạnh với các chủ đề Maya, Hy Lạp, rừng Amazon và tàu lượn Zeus.",
+      "highlights": [
+        "Tàu lượn Zeus",
+        "Huyền thoại Maya",
+        "Vượt thác rừng Amazon"
+      ],
+      "suitableAudience": "Phù hợp nhóm thích cảm giác mạnh và các trải nghiệm tốc độ cao.",
+      "suggestedDurationMin": 75
+    },
+    {
+      "id": "wonder",
+      "name": "Thế giới diệu kỳ",
+      "color": "#d04f9f",
+      "latLng": {
+        "lat": 10.3356,
+        "lng": 103.8544
+      },
+      "shortDesc": "Cổ tích, Ba Tư, Ai Cập, miền Tây",
+      "aliases": [
+        "Fantasy World",
+        "Fairy World",
+        "Thế Giới Diệu Kỳ",
+        "Wonder World"
+      ],
+      "description": "Khu chủ đề cổ tích và phiêu lưu nhẹ với các không gian Ba Tư, Ai Cập, miền Tây và trò chơi gia đình.",
+      "highlights": [
+        "Không gian cổ tích",
+        "Ốc đảo bí ẩn",
+        "Đu quay Thumbelina",
+        "Tàu tốc hành viễn Tây"
+      ],
+      "suitableAudience": "Phù hợp gia đình, trẻ em và nhóm muốn trải nghiệm nhẹ nhàng/check-in.",
+      "suggestedDurationMin": 75
+    }
+  ],
+  "attractions": [
+    {
+      "id": "once-show",
+      "name": "Show Once (Quảng trường Phượng Hoàng Lửa)",
+      "zoneId": "european",
+      "kind": "show",
+      "durationMin": 35,
+      "intensity": 2,
+      "kidFriendly": true,
+      "tags": [
+        "show",
+        "ánh sáng",
+        "check-in"
+      ],
+      "openTime": "09:00",
+      "closeTime": "19:30",
+      "showTimes": [
+        "18:30"
+      ],
+      "description": "Show biểu diễn ánh sáng và sân khấu buổi tối tại Quảng trường Phượng Hoàng Lửa, phù hợp để kết thúc ngày vui chơi và check-in.",
+      "aliases": [
+        "Show Once",
+        "Once",
+        "Once Show",
+        "Phượng Hoàng Lửa",
+        "Phoenix show"
+      ],
+      "highlights": [
+        "Show ánh sáng buổi tối",
+        "Quảng trường Phượng Hoàng Lửa",
+        "Phù hợp check-in và kết thúc ngày vui chơi"
+      ],
+      "suitableAudience": "Phù hợp mọi lứa tuổi, nhóm muốn xem show và check-in buổi tối.",
+      "suggestedDurationMin": 35
+    },
+    {
+      "id": "ac-long",
+      "name": "Lời nguyền ác long",
+      "zoneId": "european",
+      "kind": "indoor",
+      "durationMin": 25,
+      "intensity": 3,
+      "kidFriendly": true,
+      "tags": [
+        "trong nhà",
+        "tương tác",
+        "nhập vai"
+      ],
+      "openTime": "09:00",
+      "closeTime": "19:30",
+      "description": "Trải nghiệm trong nhà theo phong cách nhập vai/tương tác ở Đại lộ châu Âu, phù hợp gia đình muốn tránh nắng hoặc mưa.",
+      "aliases": [
+        "Ác long",
+        "Ac long",
+        "Lời nguyền ác long",
+        "Dragon curse"
+      ],
+      "highlights": [
+        "Trải nghiệm trong nhà",
+        "Tương tác nhập vai",
+        "Phù hợp khi muốn tránh nắng/mưa"
+      ],
+      "suitableAudience": "Phù hợp gia đình và nhóm thích trải nghiệm trong nhà.",
+      "suggestedDurationMin": 25
+    },
+    {
+      "id": "song-than-oahu",
+      "name": "Sóng thần Oahu",
+      "zoneId": "tornado",
+      "kind": "water",
+      "durationMin": 30,
+      "intensity": 3,
+      "kidFriendly": true,
+      "tags": [
+        "nước",
+        "gia đình"
+      ],
+      "openTime": "09:00",
+      "closeTime": "19:30",
+      "description": "Khu sóng nước dành cho gia đình trong công viên nước, hợp nhóm muốn vui chơi nhẹ nhàng với nước.",
+      "aliases": [
+        "Sóng thần Oahu",
+        "Oahu wave",
+        "Hồ sóng"
+      ],
+      "highlights": [
+        "Trò chơi nước",
+        "Phù hợp gia đình",
+        "Cường độ vừa phải"
+      ],
+      "suitableAudience": "Phù hợp gia đình và nhóm muốn vui chơi với nước.",
+      "suggestedDurationMin": 30
+    },
+    {
+      "id": "noc-doc-mang-xa",
+      "name": "Đường trượt Nọc độc mãng xà (175m)",
+      "zoneId": "tornado",
+      "kind": "water",
+      "durationMin": 20,
+      "intensity": 5,
+      "kidFriendly": false,
+      "tags": [
+        "nước",
+        "cảm giác mạnh"
+      ],
+      "openTime": "09:00",
+      "closeTime": "19:30",
+      "description": "Đường trượt nước dài và mạnh, phù hợp người thích cảm giác mạnh hơn là gia đình có trẻ nhỏ.",
+      "aliases": [
+        "Nọc độc mãng xà",
+        "Mang xa",
+        "Đường trượt 175m"
+      ],
+      "highlights": [
+        "Đường trượt nước dài 175m",
+        "Cảm giác mạnh",
+        "Cường độ 5/5"
+      ],
+      "suitableAudience": "Phù hợp người thích cảm giác mạnh; không khuyến nghị cho trẻ nhỏ.",
+      "suggestedDurationMin": 20
+    },
+    {
+      "id": "water-general",
+      "name": "Khu trượt nước tổng hợp",
+      "zoneId": "tornado",
+      "kind": "water",
+      "durationMin": 60,
+      "intensity": 3,
+      "kidFriendly": true,
+      "tags": [
+        "nước",
+        "gia đình",
+        "nghỉ ngơi"
+      ],
+      "openTime": "09:00",
+      "closeTime": "19:30",
+      "description": "Khu trượt nước tổng hợp để chơi lâu, nghỉ ngơi và vui chơi theo nhóm gia đình trong Thế giới lốc xoáy.",
+      "aliases": [
+        "Khu trượt nước",
+        "Trượt nước tổng hợp",
+        "Water slides"
+      ],
+      "highlights": [
+        "Nhiều trò trượt nước",
+        "Có thể chơi lâu",
+        "Phù hợp gia đình"
+      ],
+      "suitableAudience": "Phù hợp gia đình và nhóm muốn dành thời gian ở công viên nước.",
+      "suggestedDurationMin": 60
+    },
+    {
+      "id": "lang-chien-binh",
+      "name": "Ngôi làng chiến binh",
+      "zoneId": "viking",
+      "kind": "family",
+      "durationMin": 30,
+      "intensity": 2,
+      "kidFriendly": true,
+      "tags": [
+        "vận động",
+        "gia đình"
+      ],
+      "openTime": "09:00",
+      "closeTime": "19:30",
+      "description": "Không gian vận động chủ đề Viking, phù hợp gia đình và nhóm muốn hoạt động ngoài trời vừa sức.",
+      "aliases": [
+        "Ngôi làng chiến binh",
+        "Làng chiến binh",
+        "Warrior village"
+      ],
+      "highlights": [
+        "Hoạt động vận động",
+        "Chủ đề Viking",
+        "Phù hợp gia đình"
+      ],
+      "suitableAudience": "Phù hợp gia đình và nhóm thích vận động vừa sức.",
+      "suggestedDurationMin": 30
+    },
+    {
+      "id": "than-sam",
+      "name": "Thử thách thần sấm",
+      "zoneId": "viking",
+      "kind": "thrill",
+      "durationMin": 25,
+      "intensity": 4,
+      "kidFriendly": false,
+      "tags": [
+        "vận động",
+        "cảm giác mạnh"
+      ],
+      "openTime": "09:00",
+      "closeTime": "19:30",
+      "description": "Thử thách vận động cường độ cao trong khu Viking, hợp nhóm thích thử sức và cảm giác mạnh.",
+      "aliases": [
+        "Thử thách thần sấm",
+        "Thần sấm",
+        "Thunder challenge"
+      ],
+      "highlights": [
+        "Thử thách vận động",
+        "Cảm giác mạnh",
+        "Cường độ 4/5"
+      ],
+      "suitableAudience": "Phù hợp nhóm thích vận động và cảm giác mạnh; không khuyến nghị cho trẻ nhỏ.",
+      "suggestedDurationMin": 25
+    },
+    {
+      "id": "zipline",
+      "name": "Zipline xuyên rừng (cao 10m)",
+      "zoneId": "viking",
+      "kind": "thrill",
+      "durationMin": 15,
+      "intensity": 4,
+      "kidFriendly": false,
+      "tags": [
+        "cảm giác mạnh",
+        "ngoài trời"
+      ],
+      "openTime": "09:00",
+      "closeTime": "19:30",
+      "description": "Đường zipline xuyên rừng cao khoảng 10m, phù hợp người thích hoạt động ngoài trời và cảm giác mạnh.",
+      "aliases": [
+        "Zipline",
+        "Zipline xuyên rừng"
+      ],
+      "highlights": [
+        "Zipline cao khoảng 10m",
+        "Hoạt động ngoài trời",
+        "Cảm giác mạnh"
+      ],
+      "suitableAudience": "Phù hợp người thích hoạt động ngoài trời và cảm giác mạnh; không khuyến nghị cho trẻ nhỏ.",
+      "suggestedDurationMin": 15
+    },
+    {
+      "id": "aquarium",
+      "name": "Tham quan Cung điện Hải Vương",
+      "zoneId": "neptune",
+      "kind": "aquarium",
+      "durationMin": 50,
+      "intensity": 1,
+      "kidFriendly": true,
+      "tags": [
+        "trong nhà",
+        "gia đình",
+        "nghỉ ngơi",
+        "check-in"
+      ],
+      "openTime": "09:00",
+      "closeTime": "19:30",
+      "description": "Cung Điện Hải Vương là biểu tượng nổi bật nhất của VinWonders Phú Quốc với kiến trúc hình rùa biển khổng lồ. Đây là một trong những thủy cung lớn nhất khu vực, nơi sinh sống của hàng chục nghìn sinh vật biển thuộc nhiều hệ sinh thái khác nhau. Bên trong được chia thành nhiều khu vực như thế giới cá mập, thế giới chim cánh cụt, vương quốc cá khổng lồ và khu san hô nhiệt đới. Du khách có thể đi qua đường hầm đại dương, xem chương trình biểu diễn nàng tiên cá, hoạt động cho cá ăn và khám phá vẻ đẹp kỳ thú của thế giới dưới nước. Đây là địa điểm phù hợp cho mọi lứa tuổi và thường được lựa chọn làm điểm dừng chân thư giãn sau khi tham gia các trò chơi ngoài trời.",
+      "aliases": [
+        "Cung Điện Hải Vương",
+        "Cung điện Hải Vương",
+        "Thủy cung",
+        "Thuy cung",
+        "Aquarium",
+        "Neptune Palace",
+        "Sea Shell"
+      ],
+      "highlights": [
+        "Kiến trúc hình rùa biển khổng lồ",
+        "Đường hầm đại dương",
+        "Khu cá mập, chim cánh cụt, cá khổng lồ và san hô nhiệt đới",
+        "Biểu diễn nàng tiên cá và hoạt động cho cá ăn"
+      ],
+      "suitableAudience": "Phù hợp mọi lứa tuổi, gia đình có trẻ nhỏ và khách muốn nghỉ chân trong không gian trong nhà.",
+      "suggestedDurationMin": 50
+    },
+    {
+      "id": "maya",
+      "name": "Huyền thoại Maya (trượt trong nhà tối)",
+      "zoneId": "adventure",
+      "kind": "thrill",
+      "durationMin": 20,
+      "intensity": 4,
+      "kidFriendly": false,
+      "tags": [
+        "trong nhà",
+        "cảm giác mạnh"
+      ],
+      "openTime": "09:00",
+      "closeTime": "19:30",
+      "description": "Trò trượt trong nhà tối theo chủ đề Maya, phù hợp nhóm thích cảm giác mạnh nhưng vẫn muốn chơi trong nhà.",
+      "aliases": [
+        "Huyền thoại Maya",
+        "Maya",
+        "Maya ride"
+      ],
+      "highlights": [
+        "Trò trong nhà tối",
+        "Chủ đề Maya",
+        "Cảm giác mạnh 4/5"
+      ],
+      "suitableAudience": "Phù hợp nhóm thích cảm giác mạnh trong nhà; không khuyến nghị cho trẻ nhỏ.",
+      "suggestedDurationMin": 20
+    },
+    {
+      "id": "zeus",
+      "name": "Cơn thịnh nộ của Zeus (tàu lượn 110km/h)",
+      "zoneId": "adventure",
+      "kind": "thrill",
+      "durationMin": 15,
+      "intensity": 5,
+      "kidFriendly": false,
+      "tags": [
+        "cảm giác mạnh",
+        "tàu lượn"
+      ],
+      "openTime": "09:00",
+      "closeTime": "19:30",
+      "description": "Tàu lượn tốc độ cao ở Thế giới phiêu lưu, là lựa chọn nổi bật cho nhóm thích cảm giác mạnh.",
+      "aliases": [
+        "Zeus",
+        "Wrath of Zeus",
+        "Cơn thịnh nộ của Zeus",
+        "Tàu lượn Zeus",
+        "Roller coaster"
+      ],
+      "highlights": [
+        "Tàu lượn tốc độ cao",
+        "Cường độ 5/5",
+        "Trải nghiệm nổi bật cho nhóm thích cảm giác mạnh"
+      ],
+      "suitableAudience": "Phù hợp nhóm thích cảm giác mạnh; không khuyến nghị cho trẻ nhỏ.",
+      "suggestedDurationMin": 15
+    },
+    {
+      "id": "icarus",
+      "name": "Đôi cánh Icarus",
+      "zoneId": "adventure",
+      "kind": "thrill",
+      "durationMin": 15,
+      "intensity": 4,
+      "kidFriendly": false,
+      "tags": [
+        "cảm giác mạnh"
+      ],
+      "openTime": "09:00",
+      "closeTime": "19:30",
+      "description": "Trò cảm giác mạnh chủ đề Đôi cánh Icarus, phù hợp người muốn trải nghiệm thử thách nhanh trong khu phiêu lưu.",
+      "aliases": [
+        "Icarus",
+        "Đôi cánh Icarus",
+        "Doi canh Icarus"
+      ],
+      "highlights": [
+        "Trò cảm giác mạnh",
+        "Chủ đề Icarus",
+        "Thời lượng ngắn"
+      ],
+      "suitableAudience": "Phù hợp người thích trải nghiệm cảm giác mạnh nhanh; không khuyến nghị cho trẻ nhỏ.",
+      "suggestedDurationMin": 15
+    },
+    {
+      "id": "arena",
+      "name": "Chúa tể đấu trường",
+      "zoneId": "adventure",
+      "kind": "thrill",
+      "durationMin": 15,
+      "intensity": 4,
+      "kidFriendly": false,
+      "tags": [
+        "cảm giác mạnh"
+      ],
+      "openTime": "09:00",
+      "closeTime": "19:30",
+      "description": "Trò cảm giác mạnh trong khu Thế giới phiêu lưu, hợp nhóm muốn thêm một trải nghiệm thử thách ngắn.",
+      "aliases": [
+        "Chúa tể đấu trường",
+        "Đấu trường",
+        "Arena"
+      ],
+      "highlights": [
+        "Trò cảm giác mạnh",
+        "Cường độ 4/5",
+        "Thời lượng ngắn"
+      ],
+      "suitableAudience": "Phù hợp nhóm muốn thêm trải nghiệm thử thách; không khuyến nghị cho trẻ nhỏ.",
+      "suggestedDurationMin": 15
+    },
+    {
+      "id": "achilles",
+      "name": "Khiên thần Achilles",
+      "zoneId": "adventure",
+      "kind": "family",
+      "durationMin": 15,
+      "intensity": 3,
+      "kidFriendly": true,
+      "tags": [
+        "gia đình"
+      ],
+      "openTime": "09:00",
+      "closeTime": "19:30",
+      "description": "Trò gia đình cường độ vừa trong Thế giới phiêu lưu, phù hợp nhóm có cả người lớn và trẻ em lớn.",
+      "aliases": [
+        "Achilles",
+        "Khiên thần Achilles"
+      ],
+      "highlights": [
+        "Trò gia đình",
+        "Cường độ vừa",
+        "Nằm trong Thế giới phiêu lưu"
+      ],
+      "suitableAudience": "Phù hợp gia đình và trẻ em lớn.",
+      "suggestedDurationMin": 15
+    },
+    {
+      "id": "amazon",
+      "name": "Vượt thác rừng Amazon (cao 30m)",
+      "zoneId": "adventure",
+      "kind": "water",
+      "durationMin": 20,
+      "intensity": 4,
+      "kidFriendly": false,
+      "tags": [
+        "nước",
+        "cảm giác mạnh"
+      ],
+      "openTime": "09:00",
+      "closeTime": "19:30",
+      "description": "Trò vượt thác nước cao trong khu phiêu lưu, kết hợp yếu tố nước và cảm giác mạnh.",
+      "aliases": [
+        "Amazon",
+        "Vượt thác Amazon",
+        "Vượt thác rừng Amazon"
+      ],
+      "highlights": [
+        "Trò nước",
+        "Vượt thác cao 30m",
+        "Cảm giác mạnh"
+      ],
+      "suitableAudience": "Phù hợp nhóm thích trò nước và cảm giác mạnh; không khuyến nghị cho trẻ nhỏ.",
+      "suggestedDurationMin": 20
+    },
+    {
+      "id": "thumbelina",
+      "name": "Đu quay Thumbelina (Vương quốc kỳ thú)",
+      "zoneId": "wonder",
+      "kind": "kids",
+      "durationMin": 15,
+      "intensity": 1,
+      "kidFriendly": true,
+      "tags": [
+        "trẻ em",
+        "check-in"
+      ],
+      "openTime": "09:00",
+      "closeTime": "19:30",
+      "description": "Đu quay nhẹ nhàng dành cho trẻ em trong Thế giới diệu kỳ, phù hợp gia đình có bé nhỏ và nhu cầu check-in.",
+      "aliases": [
+        "Thumbelina",
+        "Đu quay Thumbelina",
+        "Vương quốc kỳ thú"
+      ],
+      "highlights": [
+        "Trò trẻ em",
+        "Cường độ nhẹ",
+        "Phù hợp check-in"
+      ],
+      "suitableAudience": "Phù hợp gia đình có bé nhỏ.",
+      "suggestedDurationMin": 15
+    },
+    {
+      "id": "aladdin",
+      "name": "Ốc đảo bí ẩn + rạp phim bay",
+      "zoneId": "wonder",
+      "kind": "family",
+      "durationMin": 30,
+      "intensity": 2,
+      "kidFriendly": true,
+      "tags": [
+        "trong nhà",
+        "gia đình"
+      ],
+      "openTime": "09:00",
+      "closeTime": "19:30",
+      "description": "Tổ hợp trải nghiệm gia đình trong nhà với chủ đề Ba Tư/rạp phim bay, hợp nhóm muốn chơi nhẹ và tránh nắng.",
+      "aliases": [
+        "Aladdin",
+        "Ốc đảo bí ẩn",
+        "Rạp phim bay",
+        "Flying theater"
+      ],
+      "highlights": [
+        "Trải nghiệm trong nhà",
+        "Chủ đề Ba Tư",
+        "Phù hợp gia đình"
+      ],
+      "suitableAudience": "Phù hợp gia đình và nhóm muốn chơi nhẹ trong nhà.",
+      "suggestedDurationMin": 30
+    },
+    {
+      "id": "ai-cap",
+      "name": "Thung lũng cổ đại (Ai Cập)",
+      "zoneId": "wonder",
+      "kind": "thrill",
+      "durationMin": 20,
+      "intensity": 3,
+      "kidFriendly": false,
+      "tags": [
+        "cảm giác mạnh",
+        "công nghệ"
+      ],
+      "openTime": "09:00",
+      "closeTime": "19:30",
+      "description": "Trải nghiệm chủ đề Ai Cập có yếu tố công nghệ và cảm giác mạnh vừa phải trong Thế giới diệu kỳ.",
+      "aliases": [
+        "Ai Cập",
+        "Thung lũng cổ đại",
+        "Ancient valley"
+      ],
+      "highlights": [
+        "Chủ đề Ai Cập",
+        "Yếu tố công nghệ",
+        "Cảm giác mạnh vừa phải"
+      ],
+      "suitableAudience": "Phù hợp nhóm muốn trải nghiệm công nghệ và cảm giác mạnh vừa.",
+      "suggestedDurationMin": 20
+    },
+    {
+      "id": "ac-dieu",
+      "name": "Hạ gục ác điểu",
+      "zoneId": "wonder",
+      "kind": "thrill",
+      "durationMin": 15,
+      "intensity": 4,
+      "kidFriendly": false,
+      "tags": [
+        "cảm giác mạnh"
+      ],
+      "openTime": "09:00",
+      "closeTime": "19:30",
+      "description": "Trò cảm giác mạnh ngắn trong Thế giới diệu kỳ, phù hợp người muốn thêm điểm thử thách vào lịch trình.",
+      "aliases": [
+        "Ác điểu",
+        "Hạ gục ác điểu"
+      ],
+      "highlights": [
+        "Trò cảm giác mạnh",
+        "Thời lượng ngắn",
+        "Nằm trong Thế giới diệu kỳ"
+      ],
+      "suitableAudience": "Phù hợp người thích cảm giác mạnh; không khuyến nghị cho trẻ nhỏ.",
+      "suggestedDurationMin": 15
+    },
+    {
+      "id": "dai-bang",
+      "name": "Sải cánh đại bàng",
+      "zoneId": "wonder",
+      "kind": "thrill",
+      "durationMin": 15,
+      "intensity": 4,
+      "kidFriendly": false,
+      "tags": [
+        "cảm giác mạnh"
+      ],
+      "openTime": "09:00",
+      "closeTime": "19:30",
+      "description": "Trò cảm giác mạnh chủ đề đại bàng trong Thế giới diệu kỳ, hợp nhóm thích trải nghiệm bay/lắc nhanh.",
+      "aliases": [
+        "Đại bàng",
+        "Sải cánh đại bàng"
+      ],
+      "highlights": [
+        "Trò cảm giác mạnh",
+        "Chủ đề đại bàng",
+        "Trải nghiệm bay/lắc nhanh"
+      ],
+      "suitableAudience": "Phù hợp nhóm thích cảm giác mạnh; không khuyến nghị cho trẻ nhỏ.",
+      "suggestedDurationMin": 15
+    },
+    {
+      "id": "mien-tay",
+      "name": "Tàu tốc hành viễn Tây",
+      "zoneId": "wonder",
+      "kind": "family",
+      "durationMin": 20,
+      "intensity": 3,
+      "kidFriendly": true,
+      "tags": [
+        "gia đình",
+        "miền Tây"
+      ],
+      "openTime": "09:00",
+      "closeTime": "19:30",
+      "description": "Trò tàu tốc hành chủ đề viễn Tây, cường độ vừa và phù hợp gia đình.",
+      "aliases": [
+        "Miền Tây",
+        "Tàu tốc hành viễn Tây",
+        "Western train"
+      ],
+      "highlights": [
+        "Tàu tốc hành chủ đề viễn Tây",
+        "Cường độ vừa",
+        "Phù hợp gia đình"
+      ],
+      "suitableAudience": "Phù hợp gia đình và nhóm muốn trải nghiệm cường độ vừa.",
+      "suggestedDurationMin": 20
+    },
+    {
+      "id": "tay-sung",
+      "name": "Tay súng cự phách (bắn súng tương tác)",
+      "zoneId": "wonder",
+      "kind": "family",
+      "durationMin": 15,
+      "intensity": 2,
+      "kidFriendly": true,
+      "tags": [
+        "gia đình",
+        "tương tác"
+      ],
+      "openTime": "09:00",
+      "closeTime": "19:30",
+      "description": "Trò bắn súng tương tác cường độ nhẹ, phù hợp gia đình và nhóm thích chơi thi đấu vui vẻ.",
+      "aliases": [
+        "Tay súng",
+        "Tay súng cự phách",
+        "Bắn súng tương tác"
+      ],
+      "highlights": [
+        "Bắn súng tương tác",
+        "Cường độ nhẹ",
+        "Phù hợp thi đấu vui vẻ"
+      ],
+      "suitableAudience": "Phù hợp gia đình và nhóm thích trò tương tác nhẹ.",
+      "suggestedDurationMin": 15
+    }
+  ]
+}

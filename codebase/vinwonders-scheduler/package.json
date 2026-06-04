@@ -4,9 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "concurrently -n web,api -c blue,green \"vite\" \"tsx watch server/index.ts\"",
+    "dev": "concurrently -n web,api -c blue,green \"vite\" \"python -m backend\"",
     "web": "vite",
-    "api": "tsx watch server/index.ts",
+    "api": "python -m backend",
     "build": "tsc -b && vite build",
     "test": "vitest run --passWithNoTests"
   },

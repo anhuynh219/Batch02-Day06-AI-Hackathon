@@ -1,14 +1,38 @@
+
 import { useState } from 'react'
 import { useStore } from '../store/useStore'
-import { requestPlan } from '../lib/aiClient'
+import { logChatTurn, requestPlan } from '../lib/aiClient'
+import { getCatalogInfo, isCatalogInfoIntent } from '../lib/catalogInfo'
 import { SuggestionCards } from './SuggestionCards'
 import type { PlanEntry } from '../types'
 
 const EXAMPLES = [
   'Đoàn 4 người có bé 6 tuổi, đến 9h về 15h, thích nhẹ nhàng và muốn xem show, ăn trưa ~12h.',
   'Nhóm 2 bạn trẻ mê cảm giác mạnh, chơi cả ngày, ưu tiên tàu lượn.',
-  'Có trò nào vui không?',
+  'Có fact gì về tàu lượn Zeus?',
 ]
+
+const REDUCTION_EDIT_KEYWORDS = [
+  'bo bot', 'bot diem', 'bot them', 'giam bot', 'giam so diem', 'rut gon',
+  'it diem', 'it hon', 'ngan hon', 'cat bot', 'xoa bot', 'loai bot',
+  'fewer', 'less', 'shorten', 'reduce',
+]
+
+function normalizeEditIntent(text: string) {
+  return text
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/đ/g, 'd')
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+export function isReductionEditRequest(text: string) {
+  const q = normalizeEditIntent(text)
+  return REDUCTION_EDIT_KEYWORDS.some((keyword) => q.includes(keyword))
+}
 
 export function ChatPanel() {
   const [input, setInput] = useState('')
@@ -18,13 +42,33 @@ export function ChatPanel() {
     const value = (text ?? input).trim()
     if (!value || busy) return
     setInput('')
+    const turnStartedAt = new Date().toISOString()
+    const turnStartMs = performance.now()
     pushMessage({ role: 'user', text: value })
     setBusy(true)
 
     const summary = itinerary.map((i) => `${i.startTime} ${i.title}`).join(', ')
     const history = [...messages, { role: 'user' as const, text: value }]
     try {
-      const r = await requestPlan(history, summary)
+      if (isCatalogInfoIntent(value)) {
+        const info = getCatalogInfo(value)
+        if (info) {
+          const endTimestamp = new Date().toISOString()
+          setLastSuggestedIds(info.ids)
+          pushMessage({ role: 'assistant', text: info.text })
+          logChatTurn({
+            startTimestamp: turnStartedAt,
+            endTimestamp,
+            latencyMs: Math.round(performance.now() - turnStartMs),
+            userMessage: value,
+            assistantResponse: info.text,
+            toolCalls: ['catalogInfo'],
+          }).catch((error) => console.warn('chat log failed', error))
+          return
+        }
+      }
+
+      const r = await requestPlan(history, summary, turnStartedAt)
       if (r.constraints) setConstraints(r.constraints)
       if (r.action !== 'clarify' && r.chosenIds?.length) {
         const newEntries: PlanEntry[] = r.chosenIds.map((id) => ({ kind: 'attraction', refId: id }))
@@ -33,8 +77,8 @@ export function ChatPanel() {
           const at = Math.floor(newEntries.length / 2)
           newEntries.splice(at, 0, { kind: 'meal', meal, durationMin: 45 })
         }
-        // 'edit' merges with existing; 'plan' replaces
-        setEntries(r.action === 'edit' ? [...entries, ...newEntries] : newEntries)
+        const shouldAppend = r.action === 'edit' && !isReductionEditRequest(value)
+        setEntries(shouldAppend ? [...entries, ...newEntries] : newEntries)
       }
       setLastSuggestedIds(r.chosenIds ?? [])
       pushMessage({ role: 'assistant', text: r.clarifyQuestion ? `${r.assistantText}\n${r.clarifyQuestion}` : r.assistantText })

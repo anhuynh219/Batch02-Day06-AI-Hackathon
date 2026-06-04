@@ -6,6 +6,11 @@ export type Zone = {
   color: string       // hex, for map + timeline accents
   latLng: LatLng      // seed coords (refined via Calibration)
   shortDesc: string
+  aliases?: string[]
+  description?: string
+  highlights?: string[]
+  suitableAudience?: string
+  suggestedDurationMin?: number
 }
 
 export type AttractionKind =
@@ -20,6 +25,11 @@ export type Attraction = {
   intensity: 1 | 2 | 3 | 4 | 5
   kidFriendly: boolean
   tags: string[]
+  description: string
+  aliases?: string[]
+  highlights?: string[]
+  suitableAudience?: string
+  suggestedDurationMin?: number
   openTime: string    // "HH:MM"
   closeTime: string   // "HH:MM"
   showTimes?: string[] // only for kind==='show', e.g. ["18:30"]

@@ -2,8 +2,8 @@ import { defineConfig } from 'vitest/config'
 import { loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// Read PORT from .env so the dev proxy always targets the same port the API
-// server (server/index.ts) listens on — change PORT in one place (.env) only.
+// Read PORT from .env so the dev proxy always targets the same port the FastAPI
+// backend listens on — change PORT in one place (.env) only.
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
   const apiPort = env.PORT || '8787'
