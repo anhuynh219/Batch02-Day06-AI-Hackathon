@@ -1,7 +1,8 @@
 import type { Attraction, PlanEntry } from '../types'
 
-// Distance between two zone ids in metres (real walking distance; supplied by caller).
-export type ZoneDist = (a: string, b: string) => number
+// Distance in metres between two place keys (attraction id or zone id) — real walking
+// distance, supplied by the caller. Used point-to-point so each attraction is its own node.
+export type PlaceDist = (a: string, b: string) => number
 
 // ---- Closed-tour TSP: start & end at node 0, visit nodes 1..n, minimise total. ----
 // Exact Held-Karp for small n (a day rarely spans >6 distinct zones), nearest-neighbour
@@ -89,16 +90,19 @@ function twoOpt(order: number[], M: number[][]): number[] {
 }
 
 // ---- Reorder a plan so walking is minimised, starting & ending at the entrance ----
-// Rules (per product decision): only UNLOCKED, non-show attractions are reordered, grouped
-// by zone in the TSP-optimal zone order. Shows keep their fixed times (appended late, by
-// showtime). Meals go to the middle. Locked items / breaks keep their order, appended after.
+// Rules (per product decision): only UNLOCKED, non-show attractions are reordered. They are
+// TSP-ordered POINT-TO-POINT (each attraction is its own node, using its own coordinate) so
+// the tour is the true shortest walk that starts & ends at the entrance — attractions that
+// happen to share a zone naturally end up adjacent because the hop between them is ~free.
+// Shows keep their fixed times (appended late, by showtime). Meals go to the middle. Locked
+// items / breaks keep their order, appended after.
 export function optimizeEntries(
   entries: PlanEntry[],
   attractions: Record<string, Attraction>,
-  entranceZoneId: string,
-  zoneDist: ZoneDist,
+  entranceKey: string,
+  dist: PlaceDist,
 ): PlanEntry[] {
-  const movable: { entry: PlanEntry; zoneId: string }[] = []
+  const movable: { entry: PlanEntry; key: string }[] = []
   const shows: PlanEntry[] = []
   const meals: PlanEntry[] = []
   const others: PlanEntry[] = [] // breaks + locked attractions
@@ -109,7 +113,7 @@ export function optimizeEntries(
       if (!a) { others.push(e); continue }
       if (a.kind === 'show') { shows.push(e); continue }
       if (e.locked) { others.push(e); continue }
-      movable.push({ entry: e, zoneId: a.zoneId })
+      movable.push({ entry: e, key: a.id })
     } else if (e.kind === 'meal') {
       meals.push(e)
     } else {
@@ -118,13 +122,11 @@ export function optimizeEntries(
   }
 
   let movableOrdered: PlanEntry[] = []
-  const zones = [...new Set(movable.map((m) => m.zoneId))]
-  if (zones.length > 0) {
-    const nodes = [entranceZoneId, ...zones]
-    const M = nodes.map((a) => nodes.map((b) => zoneDist(a, b)))
-    const order = tspOrder(zones.length, M) // indices into nodes (1..k)
-    const zoneOrder = order.map((i) => nodes[i])
-    movableOrdered = zoneOrder.flatMap((z) => movable.filter((m) => m.zoneId === z).map((m) => m.entry))
+  if (movable.length > 0) {
+    const nodes = [entranceKey, ...movable.map((m) => m.key)]
+    const M = nodes.map((a) => nodes.map((b) => dist(a, b)))
+    const order = tspOrder(movable.length, M) // indices into nodes (1..k)
+    movableOrdered = order.map((i) => movable[i - 1].entry)
   }
 
   const result = [...movableOrdered]

@@ -19,8 +19,13 @@ const baseConstraints: UserConstraints = {
   prefs: [], meals: [], mustDo: [], avoid: [],
 }
 
-// travel: 10 min between different zones, 0 if same
-const travel = (a: string | null, b: string | null) => (a && b && a !== b ? 10 : 0)
+// travel takes PLACE keys (attraction id or zone id). Resolve an attraction id to its
+// zone, then charge 10 min between different zones, 0 within the same zone.
+const zoneOf = (k: string | null) => (k ? (attrs[k]?.zoneId ?? k) : null)
+const travel = (a: string | null, b: string | null) => {
+  const za = zoneOf(a), zb = zoneOf(b)
+  return za && zb && za !== zb ? 10 : 0
+}
 
 describe('buildItinerary', () => {
   it('sequences two rides, no leading buffer, buffer between different zones', () => {

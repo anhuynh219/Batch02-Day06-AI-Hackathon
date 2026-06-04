@@ -40,9 +40,11 @@ describe('optimizeEntries', () => {
     a3: { id: 'a3', name: 'a3', zoneId: 'A', kind: 'family', durationMin: 20, intensity: 3, kidFriendly: true, tags: [], openTime: '09:00', closeTime: '19:30' },
     show1: { id: 'show1', name: 'show1', zoneId: 'C', kind: 'show', durationMin: 30, intensity: 2, kidFriendly: true, tags: [], openTime: '09:00', closeTime: '19:30', showTimes: ['18:30'] },
   }
-  // line: E=0, A=1, B=9, C=5
+  // 1-D positions per zone; E=entrance. dist works on PLACE keys (attraction id or
+  // zone id), so resolve an attraction id to its zone position, else treat key as a zone.
   const pos: Record<string, number> = { E: 0, A: 1, B: 9, C: 5 }
-  const zoneDist = (a: string, b: string) => Math.abs(pos[a] - pos[b])
+  const posOf = (k: string) => pos[attractions[k]?.zoneId ?? k]
+  const dist = (a: string, b: string) => Math.abs(posOf(a) - posOf(b))
 
   const entries: PlanEntry[] = [
     { kind: 'attraction', refId: 'a2' }, // B
@@ -52,7 +54,7 @@ describe('optimizeEntries', () => {
     { kind: 'attraction', refId: 'show1' }, // show
   ]
 
-  const out = optimizeEntries(entries, attractions, 'E', zoneDist)
+  const out = optimizeEntries(entries, attractions, 'E', dist)
 
   it('keeps every entry', () => {
     expect(out.length).toBe(entries.length)

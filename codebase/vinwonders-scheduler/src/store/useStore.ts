@@ -21,9 +21,24 @@ export function zoneLatLng(zoneId: string | null): { lat: number; lng: number } 
   return o ?? (z ? z.latLng : null)
 }
 
+// Resolve a "place key" to coordinates. A key is an Attraction id OR a Zone id
+// (distinct namespaces). Priority for an attraction: calibration override → its own
+// latLng → its zone's latLng. For a zone key, defer to zoneLatLng. This is what makes
+// each attraction a distinct point on the map / in routing, while still falling back
+// to its zone when no per-point coordinate is set.
+export function placeLatLng(key: string | null): { lat: number; lng: number } | null {
+  if (!key) return null
+  const a = ATTRACTIONS_BY_ID[key]
+  if (a) {
+    const o = useStore.getState().coordOverrides[key]
+    return o ?? a.latLng ?? zoneLatLng(a.zoneId)
+  }
+  return zoneLatLng(key)
+}
+
 const travel = (a: string | null, b: string | null) => {
   if (!a || !b || a === b) return 0
-  const pa = zoneLatLng(a), pb = zoneLatLng(b)
+  const pa = placeLatLng(a), pb = placeLatLng(b)
   if (!pa || !pb) return 0
   // Prefer real path-following distance from the walkway graph; fall back to
   // straight-line (haversine) when the graph isn't loaded or the points are
@@ -36,23 +51,28 @@ const travel = (a: string | null, b: string | null) => {
   return walkMinutes(pa, pb)
 }
 
-// Real walking distance in METRES between two zones — cost metric for the TSP optimiser.
-const zoneDistMeters = (a: string, b: string) => {
+// Real walking distance in METRES between two places — cost metric for the TSP optimiser.
+const placeDistMeters = (a: string, b: string) => {
   if (!a || !b || a === b) return 0
-  const pa = zoneLatLng(a), pb = zoneLatLng(b)
+  const pa = placeLatLng(a), pb = placeLatLng(b)
   if (!pa || !pb) return 0
   const g = getGraph()
   if (g) { const r = route(g, pa, pb); if (r) return r.distanceM }
   return haversineMeters(pa, pb) * 1.3
 }
 
+// Place key of an itinerary item: its attraction id (point-level) or, failing that,
+// its zone id (meals/breaks/entrance/return have no attraction of their own).
+const itemKey = (it: ItineraryItem): string | null => it.refId ?? it.zoneId
+
 function totalWalkMeters(itinerary: ItineraryItem[]): number {
   let total = 0
   let prev: string | null = null
   for (const it of itinerary) {
-    if (!it.zoneId) continue
-    if (prev) total += zoneDistMeters(prev, it.zoneId)
-    prev = it.zoneId
+    const key = itemKey(it)
+    if (!key) continue
+    if (prev) total += placeDistMeters(prev, key)
+    prev = key
   }
   return total
 }
@@ -109,7 +129,7 @@ export const useStore = create<State>((set, get) => ({
   // fixed times, and close the loop back to the entrance. User-triggered (augmentation).
   optimize: () => {
     const before = totalWalkMeters(get().itinerary)
-    const next = optimizeEntries(get().entries, ATTRACTIONS_BY_ID, ENTRANCE.id, zoneDistMeters)
+    const next = optimizeEntries(get().entries, ATTRACTIONS_BY_ID, ENTRANCE.id, placeDistMeters)
     set({ entries: next })
     get().recompute()
     const after = totalWalkMeters(get().itinerary)
